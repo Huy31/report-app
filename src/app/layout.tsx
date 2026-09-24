@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AppStoreProvider } from '@/data/store';
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: 'Cổng Báo Cáo Công Việc • Trường ĐH Công Nghệ GTVT (UTT)',
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body>
         <AppStoreProvider>{children}</AppStoreProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
