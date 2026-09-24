@@ -108,6 +108,7 @@ export default function Sidebar({
 
       {/* Sidebar wrapper — controls width animation; no overflow:hidden so toggle btn is visible */}
       <div
+        className="sidebar-wrapper"
         style={{
           width: W,
           minWidth: W,
@@ -136,11 +137,26 @@ export default function Sidebar({
           {/* Responsive CSS */}
           <style>{`
           @media (max-width: 991px) {
+            .sidebar-wrapper {
+              width: 0 !important;
+              min-width: 0 !important;
+              position: fixed !important;
+              height: 0 !important;
+              pointer-events: none !important;
+            }
+            .desktop-collapse-btn {
+              display: none !important;
+            }
             .app-sidebar {
               position: fixed !important;
               top: 0;
               bottom: 0;
               left: 0;
+              width: 280px !important;
+              max-width: 85vw !important;
+              height: 100vh !important;
+              pointer-events: auto !important;
+              z-index: 1100 !important;
               transform: ${isMobileOpen ? 'translateX(0)' : 'translateX(-100%)'};
               transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             }
@@ -382,6 +398,7 @@ export default function Sidebar({
         {/* ── Collapse Toggle Button — outside aside so not clipped ── */}
         <button
           type="button"
+          className="desktop-collapse-btn"
           onClick={() => setCollapsed(!collapsed)}
           title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
           style={{

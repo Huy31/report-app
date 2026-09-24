@@ -43,17 +43,61 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'flex-end',
-        gap: '12px',
-        marginBottom: '16px',
-      }}
-    >
+    <div className="filter-bar-container">
+      <style>{`
+        .filter-bar-container {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: flex-end;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        .filter-field {
+          display: flex;
+          flex-direction: column;
+        }
+        .filter-actions-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        @media (max-width: 768px) {
+          .filter-bar-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
+          .filter-field-year {
+            grid-column: 1 / 2;
+          }
+          .filter-field-day {
+            grid-column: 2 / 3;
+          }
+          .filter-field-week {
+            grid-column: 1 / 3;
+          }
+          .filter-select {
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+          .filter-actions-group {
+            grid-column: 1 / 3;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px !important;
+          }
+          .filter-action-btn {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0 8px !important;
+            font-size: 12.5px !important;
+          }
+        }
+      `}</style>
+
       {/* 1. Chọn năm */}
-      <div>
+      <div className="filter-field filter-field-year">
         <label
           style={{
             display: 'block',
@@ -66,6 +110,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
           Chọn năm
         </label>
         <select
+          className="filter-select"
           value={selectedYear}
           onChange={(e) => {
             const newYear = Number(e.target.value);
@@ -97,8 +142,47 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
         </select>
       </div>
 
-      {/* 2. Chọn tuần xem báo cáo */}
-      <div>
+      {/* 2. Chọn thứ */}
+      <div className="filter-field filter-field-day">
+        <label
+          style={{
+            display: 'block',
+            fontSize: '12.5px',
+            fontWeight: 700,
+            color: '#1f2937',
+            marginBottom: '4px',
+          }}
+        >
+          Chọn thứ
+        </label>
+        <select
+          className="filter-select"
+          value={selectedDay}
+          onChange={(e) => setSelectedDay(e.target.value)}
+          style={{
+            height: '36px',
+            padding: '4px 10px',
+            borderRadius: '4px',
+            border: '1px solid #cbd5e1',
+            fontSize: '13px',
+            fontWeight: 500,
+            color: '#1e293b',
+            backgroundColor: '#ffffff',
+            outline: 'none',
+            minWidth: '140px',
+            cursor: 'pointer',
+          }}
+        >
+          {daysOfWeek.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 3. Chọn tuần xem báo cáo */}
+      <div className="filter-field filter-field-week">
         <label
           style={{
             display: 'block',
@@ -111,6 +195,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
           Chọn tuần xem báo cáo
         </label>
         <select
+          className="filter-select"
           value={selectedWeek}
           onChange={(e) => setSelectedWeek(Number(e.target.value))}
           style={{
@@ -135,48 +220,11 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
         </select>
       </div>
 
-      {/* 3. Chọn thứ */}
-      <div>
-        <label
-          style={{
-            display: 'block',
-            fontSize: '12.5px',
-            fontWeight: 700,
-            color: '#1f2937',
-            marginBottom: '4px',
-          }}
-        >
-          Chọn thứ
-        </label>
-        <select
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-          style={{
-            height: '36px',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            border: '1px solid #cbd5e1',
-            fontSize: '13px',
-            fontWeight: 500,
-            color: '#1e293b',
-            backgroundColor: '#ffffff',
-            outline: 'none',
-            minWidth: '150px',
-            cursor: 'pointer',
-          }}
-        >
-          {daysOfWeek.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 4. Action Buttons matching Screenshot 2 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+      {/* 4. Action Buttons */}
+      <div className="filter-actions-group">
         <button
           type="button"
+          className="filter-action-btn"
           onClick={handlePrevWeek}
           style={{
             height: '36px',
@@ -202,6 +250,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
         {/* Nút Tuần sau > */}
         <button
           type="button"
+          className="filter-action-btn"
           onClick={handleNextWeek}
           style={{
             height: '36px',
@@ -224,16 +273,17 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
           <span>Tuần sau &gt;</span>
         </button>
 
-        {/* Nút + Tạo báo cáo (Gold/Yellow) */}
+        {/* Nút + Tạo báo cáo */}
         <button
           type="button"
+          className="filter-action-btn"
           onClick={onCreateNewReport}
           style={{
             height: '36px',
             padding: '0 16px',
             borderRadius: '4px',
             backgroundColor: '#d97706',
-            color: '#1f2937',
+            color: '#ffffff',
             border: 'none',
             fontSize: '13px',
             fontWeight: 700,
@@ -250,9 +300,10 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
           <span>Tạo báo cáo</span>
         </button>
 
-        {/* Nút ▲ Lưu ý (Dark Navy) */}
+        {/* Nút ▲ Lưu ý */}
         <button
           type="button"
+          className="filter-action-btn"
           onClick={handleNoticeClick}
           style={{
             height: '36px',

@@ -97,6 +97,7 @@ export default function Header({
         }
         @media (max-width: 768px) {
           .clock-container { display: none !important; }
+          .header-user-info { display: none !important; }
         }
         .hamburger-btn {
           display: none;
@@ -195,7 +196,7 @@ export default function Header({
                   currentUser.fullName.charAt(currentUser.fullName.lastIndexOf(' ') + 1) || 'U'
                 )}
               </div>
-              <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
+              <div className="header-user-info" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>
                   {currentUser.fullName}
                 </span>

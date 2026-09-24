@@ -98,14 +98,21 @@ export default function DashboardPage() {
       />
 
       {/* 2. Main content area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%', overflowX: 'hidden' }}>
         <Header
           onToggleSidebar={() => setIsSidebarMobileOpen(!isSidebarMobileOpen)}
           onOpenProfile={() => setIsProfileModalOpen(true)}
           onOpenChangePassword={() => setIsChangePassModalOpen(true)}
         />
 
-        <main style={{ flex: 1, padding: '16px 24px', maxWidth: '1600px', width: '100%', margin: '0 auto' }}>
+        <main className="dashboard-main" style={{ flex: 1, padding: '16px 20px', maxWidth: '1600px', width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+          <style>{`
+            @media (max-width: 768px) {
+              .dashboard-main {
+                padding: 12px 10px !important;
+              }
+            }
+          `}</style>
 
           {/* Filter Bar */}
           <FilterBar onCreateNewReport={handleCreateNew} />
