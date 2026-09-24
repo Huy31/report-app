@@ -91,7 +91,7 @@ export const INITIAL_USERS: User[] = [
     avatarUrl: '',
   },
   {
-    id: 'user-hoan',
+    id: 'user-1',
     username: 'NV001',
     password: 'password123',
     fullName: 'Nguyễn Công Hoan',
@@ -111,7 +111,7 @@ export const INITIAL_USERS: User[] = [
     avatarUrl: '',
   },
   {
-    id: 'user-hung',
+    id: 'user-2',
     username: 'NV002',
     password: 'password123',
     fullName: 'Nguyễn Việt Hùng',
@@ -131,7 +131,7 @@ export const INITIAL_USERS: User[] = [
     avatarUrl: '',
   },
   {
-    id: 'user-1',
+    id: 'user-3',
     username: 'NV003',
     password: 'password123',
     fullName: 'TS. Nguyễn Văn An',
@@ -151,7 +151,7 @@ export const INITIAL_USERS: User[] = [
     avatarUrl: '',
   },
   {
-    id: 'user-2',
+    id: 'user-4',
     username: 'NV004',
     password: 'password123',
     fullName: 'ThS. Trần Thị Bích',
@@ -174,8 +174,31 @@ export const INITIAL_USERS: User[] = [
 
 export const INITIAL_REPORTS: WorkReport[] = [
   {
-    id: 'rep-hoan-1',
-    authorId: 'user-hoan',
+    id: 'rep-1',
+    authorId: 'user-3',
+    authorName: 'TS. Nguyễn Văn An',
+    authorCode: 'NV003',
+    department: 'Khoa Công nghệ Thông tin',
+    dayOfWeek: 'Thứ Hai',
+    date: '2026-09-21',
+    weekNumber: 38,
+    year: 2026,
+    currentWork: 'Hoàn thành thẩm định đề cương chi tiết học phần Lập trình Web nâng cao; Họp Hội đồng Khoa học định kỳ tháng 9.',
+    nextWork: 'Rà soát bài giảng thực hành Cloud Computing; Tiếp nhận hồ sơ đồ án tốt nghiệp.',
+    proposal: 'Đề xuất trang bị thêm bộ lưu điện cho phòng lab',
+    attachedFile: 'de_cuong_hoc_phan_v2.pdf',
+    attachment: {
+      name: 'de_cuong_hoc_phan_v2.pdf',
+      size: 496844, // ~485 KB
+      type: 'application/pdf',
+      uploadedAt: '2026-09-21T08:30:00Z',
+    },
+    status: 'completed',
+    createdAt: '2026-09-21T08:30:00Z',
+  },
+  {
+    id: 'rep-2',
+    authorId: 'user-1',
     authorName: 'Nguyễn Công Hoan',
     authorCode: 'NV001',
     department: 'Khoa Công nghệ Thông tin',
@@ -199,31 +222,8 @@ export const INITIAL_REPORTS: WorkReport[] = [
     createdAt: '2026-09-21T17:13:00Z',
   },
   {
-    id: 'rep-1',
-    authorId: 'user-1',
-    authorName: 'TS. Nguyễn Văn An',
-    authorCode: 'NV003',
-    department: 'Khoa Công nghệ Thông tin',
-    dayOfWeek: 'Thứ Hai',
-    date: '2026-09-21',
-    weekNumber: 38,
-    year: 2026,
-    currentWork: 'Hoàn thành thẩm định đề cương chi tiết học phần Lập trình Web nâng cao; Họp Hội đồng Khoa học định kỳ tháng 9.',
-    nextWork: 'Rà soát bài giảng thực hành Cloud Computing; Tiếp nhận hồ sơ đồ án tốt nghiệp.',
-    proposal: 'Đề xuất trang bị thêm bộ lưu điện cho phòng lab',
-    attachedFile: 'de_cuong_hoc_phan_v2.pdf',
-    attachment: {
-      name: 'de_cuong_hoc_phan_v2.pdf',
-      size: 496844, // ~485 KB
-      type: 'application/pdf',
-      uploadedAt: '2026-09-21T08:30:00Z',
-    },
-    status: 'completed',
-    createdAt: '2026-09-21T08:30:00Z',
-  },
-  {
     id: 'rep-3',
-    authorId: 'user-hung',
+    authorId: 'user-2',
     authorName: 'Nguyễn Việt Hùng',
     authorCode: 'NV002',
     department: 'Phòng Quản trị Thiết bị',

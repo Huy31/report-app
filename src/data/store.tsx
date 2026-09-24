@@ -78,10 +78,10 @@ interface AppStoreContextType {
 const AppStoreContext = createContext<AppStoreContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  USERS: 'egov_utt_users_v2',
-  CURRENT_USER: 'egov_utt_current_user_v2',
-  REPORTS: 'egov_utt_reports_v2',
-  NOTIFICATIONS: 'egov_utt_notifications_v2',
+  USERS: 'egov_utt_users_v3',
+  CURRENT_USER: 'egov_utt_current_user_v3',
+  REPORTS: 'egov_utt_reports_v3',
+  NOTIFICATIONS: 'egov_utt_notifications_v3',
 };
 
 export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
@@ -253,8 +253,16 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
   // Push new notification
   const addNotification = (type: 'create' | 'update' | 'delete' | 'warning' | 'info', title: string, content: string) => {
+    const notifNumbers = notifications
+      .map((n) => {
+        const match = n.id.match(/^notif-(\d+)$/i);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter((n) => !isNaN(n));
+    const nextNotifNum = (notifNumbers.length > 0 ? Math.max(...notifNumbers) : 0) + 1;
+
     const newNotif: AppNotification = {
-      id: 'notif-' + Date.now(),
+      id: `notif-${nextNotifNum}`,
       type,
       title,
       content,
@@ -384,12 +392,28 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       return { success: false, message: 'Email này đã tồn tại trong hệ thống!' };
     }
 
+    // Sinh ID ngắn gọn, tuần tự: user-1, user-2, user-3...
+    let nextUserId = '';
+    const nvMatch = finalUsername.match(/^NV(\d+)$/i);
+    if (nvMatch) {
+      nextUserId = `user-${parseInt(nvMatch[1], 10)}`;
+    } else {
+      const userNumbers = users
+        .map((u) => {
+          const match = u.id.match(/^user-(\d+)$/i);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+        .filter((n) => !isNaN(n));
+      const nextNum = (userNumbers.length > 0 ? Math.max(...userNumbers) : 0) + 1;
+      nextUserId = `user-${nextNum}`;
+    }
+
     const newUser: User = {
       ...userData,
       department: userData.department || 'Trường ĐH Công nghệ GTVT',
       role: userData.role || 'staff',
       username: finalUsername,
-      id: 'user-' + Date.now(),
+      id: nextUserId,
     };
 
     const updated = [...users, newUser];
@@ -448,9 +472,19 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const addReport = (reportData: Omit<WorkReport, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorCode' | 'department'>) => {
     if (!currentUser) return;
 
+    // Sinh ID báo cáo tuần tự ngắn gọn: rep-1, rep-2, rep-3, rep-4...
+    const repNumbers = reports
+      .map((r) => {
+        const match = r.id.match(/^rep-(\d+)$/i);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter((n) => !isNaN(n));
+    const nextRepNum = (repNumbers.length > 0 ? Math.max(...repNumbers) : 0) + 1;
+    const newReportId = `rep-${nextRepNum}`;
+
     const newReport: WorkReport = {
       ...reportData,
-      id: 'rep-' + Date.now(),
+      id: newReportId,
       authorId: currentUser.id,
       authorName: currentUser.fullName,
       authorCode: currentUser.username,
@@ -514,10 +548,20 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     const target = reports.find((r) => r.id === reportId);
     if (!target) return;
 
+    // Sinh ID bình luận tuần tự ngắn gọn: cmt-1, cmt-2, cmt-3...
+    const allComments = reports.flatMap((r) => r.comments || []);
+    const cmtNumbers = allComments
+      .map((c) => {
+        const match = c.id.match(/^cmt-(\d+)$/i);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter((n) => !isNaN(n));
+    const nextCmtNum = (cmtNumbers.length > 0 ? Math.max(...cmtNumbers) : 0) + 1;
+
     const newComment: ReportComment = {
-      id: `cmt-${Date.now()}`,
+      id: `cmt-${nextCmtNum}`,
       reportId,
-      authorId: currentUser?.id || 'user-hoan',
+      authorId: currentUser?.id || 'user-1',
       authorName: currentUser?.fullName || 'Nguyễn Công Hoan',
       avatarUrl: currentUser?.avatarUrl,
       content: content.trim(),

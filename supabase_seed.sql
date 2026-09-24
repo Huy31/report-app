@@ -137,7 +137,7 @@ INSERT INTO public.users (
     ''
 ),
 (
-    'user-hoan',
+    'user-1',
     'NV001',
     'password123',
     'hoannc@gmail.com',
@@ -156,7 +156,7 @@ INSERT INTO public.users (
     ''
 ),
 (
-    'user-hung',
+    'user-2',
     'NV002',
     'password123',
     'hungnv@gmail.com',
@@ -175,7 +175,7 @@ INSERT INTO public.users (
     ''
 ),
 (
-    'user-1',
+    'user-3',
     'NV003',
     'password123',
     'annv@gmail.com',
@@ -194,7 +194,7 @@ INSERT INTO public.users (
     ''
 ),
 (
-    'user-2',
+    'user-4',
     'NV004',
     'password123',
     'bichtt@gmail.com',
@@ -213,15 +213,32 @@ INSERT INTO public.users (
     ''
 );
 
--- 2. Thêm báo cáo công việc mẫu
+-- 2. Thêm báo cáo công việc mẫu (rep-1, rep-2, rep-3...)
 INSERT INTO public.work_reports (
     id, author_id, author_name, author_code, department, day_of_week, 
     report_date, week_number, year, current_work, next_work, proposal, 
     attached_file, status, created_at
 ) VALUES 
 (
-    'rep-hoan-1',
-    'user-hoan',
+    'rep-1',
+    'user-3',
+    'TS. Nguyễn Văn An',
+    'NV003',
+    'Khoa Công nghệ Thông tin',
+    'Thứ Hai',
+    '2026-09-21',
+    38,
+    2026,
+    'Hoàn thành thẩm định đề cương chi tiết học phần Lập trình Web nâng cao; Họp Hội đồng Khoa học định kỳ tháng 9.',
+    'Rà soát bài giảng thực hành Cloud Computing; Tiếp nhận hồ sơ đồ án tốt nghiệp.',
+    'Đề xuất trang bị thêm bộ lưu điện cho phòng lab',
+    'de_cuong_hoc_phan_v2.pdf',
+    'completed',
+    '2026-09-21 08:30:00+07'
+),
+(
+    'rep-2',
+    'user-1',
     'Nguyễn Công Hoan',
     'NV001',
     'Khoa Công nghệ Thông tin',
@@ -245,25 +262,8 @@ INSERT INTO public.work_reports (
     '2026-09-21 17:13:00+07'
 ),
 (
-    'rep-1',
-    'user-1',
-    'TS. Nguyễn Văn An',
-    'NV003',
-    'Khoa Công nghệ Thông tin',
-    'Thứ Hai',
-    '2026-09-21',
-    38,
-    2026,
-    'Hoàn thành thẩm định đề cương chi tiết học phần Lập trình Web nâng cao; Họp Hội đồng Khoa học định kỳ tháng 9.',
-    'Rà soát bài giảng thực hành Cloud Computing; Tiếp nhận hồ sơ đồ án tốt nghiệp.',
-    'Đề xuất trang bị thêm bộ lưu điện cho phòng lab',
-    'de_cuong_hoc_phan_v2.pdf',
-    'completed',
-    '2026-09-21 08:30:00+07'
-),
-(
     'rep-3',
-    'user-hung',
+    'user-2',
     'Nguyễn Việt Hùng',
     'NV002',
     'Phòng Quản trị Thiết bị',
@@ -297,7 +297,7 @@ INSERT INTO public.notifications (
 ) VALUES 
 (
     'notif-unreported-hung',
-    'user-hung',
+    'user-2',
     'warning',
     'Nhắc nhở chưa nộp báo cáo',
     'Nhân viên Nguyễn Việt Hùng chưa nộp báo cáo công việc ngày hôm qua (Thứ Hai, 21/09/2026).',
