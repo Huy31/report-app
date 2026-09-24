@@ -10,6 +10,20 @@ import {
   INITIAL_REPORTS,
   INITIAL_NOTIFICATIONS,
 } from './initialData';
+import {
+  fetchUsersFromSupabase,
+  fetchReportsFromSupabase,
+  fetchNotificationsFromSupabase,
+  insertUserToSupabase,
+  updateUserInSupabase,
+  insertReportToSupabase,
+  updateReportInSupabase,
+  deleteReportFromSupabase,
+  insertCommentToSupabase,
+  insertNotificationToSupabase,
+  markAllNotificationsReadInSupabase,
+  clearNotificationsInSupabase,
+} from './supabaseService';
 
 export interface ToastData {
   id: number;
@@ -164,6 +178,46 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Sync state with Supabase database when available
+  useEffect(() => {
+    let isMounted = true;
+
+    async function syncSupabase() {
+      try {
+        const [remoteUsers, remoteReports, remoteNotifs] = await Promise.all([
+          fetchUsersFromSupabase(),
+          fetchReportsFromSupabase(),
+          fetchNotificationsFromSupabase(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (remoteUsers && remoteUsers.length > 0) {
+          setUsers(remoteUsers);
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(remoteUsers));
+        }
+
+        if (remoteReports && remoteReports.length > 0) {
+          setReports(remoteReports);
+          localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(remoteReports));
+        }
+
+        if (remoteNotifs && remoteNotifs.length > 0) {
+          setNotifications(remoteNotifs);
+          localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(remoteNotifs));
+        }
+      } catch (err) {
+        console.warn('Could not sync with Supabase:', err);
+      }
+    }
+
+    syncSupabase();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Sync to localStorage
   const saveUsers = (newUsers: User[]) => {
     setUsers(newUsers);
@@ -211,6 +265,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     const updated = [newNotif, ...notifications];
     saveNotifications(updated);
     triggerBellAndRipple();
+    insertNotificationToSupabase(newNotif).catch(console.error);
   };
 
   // Push notifications for unreported staff
@@ -235,7 +290,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       const notifId = `notif-unreported-${u.id}-${targetDate}`;
       const existing = currentNotifs.find((n) => n.id === notifId);
       if (!existing) {
-        currentNotifs.unshift({
+        const notifItem: AppNotification = {
           id: notifId,
           type: 'warning',
           title: 'Nhắc nhở chưa nộp báo cáo',
@@ -243,7 +298,9 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
           timeAgo: 'Vừa xong',
           createdAt: new Date().toISOString(),
           read: false,
-        });
+        };
+        currentNotifs.unshift(notifItem);
+        insertNotificationToSupabase(notifItem).catch(console.error);
         addedCount++;
       }
     });
@@ -342,6 +399,8 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
     }
 
+    insertUserToSupabase(newUser).catch(console.error);
+
     showToast(`Đăng ký thành công! Mã nhân viên của bạn là ${newUser.username}`, 'success', '🎉');
     return { success: true, message: 'Đăng ký thành công!' };
   };
@@ -365,6 +424,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
     const newUsers = users.map((u) => (u.id === currentUser.id ? updatedUser : u));
     saveUsers(newUsers);
+    updateUserInSupabase(currentUser.id, updatedUser).catch(console.error);
     showToast('Đã cập nhật thông tin cá nhân thành công!', 'success', '👤');
   };
 
@@ -382,6 +442,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
     const newUsers = users.map((u) => (u.id === currentUser.id ? updatedUser : u));
     saveUsers(newUsers);
+    updateUserInSupabase(currentUser.id, { password: newPass }).catch(console.error);
     showToast('Đổi mật khẩu thành công!', 'success', '🔑');
     return { success: true, message: 'Đổi mật khẩu thành công!' };
   };
@@ -402,6 +463,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
     const updated = [newReport, ...reports];
     saveReports(updated);
+    insertReportToSupabase(newReport).catch(console.error);
 
     // Kích hoạt Bell Animation, Ripple và Notification, Toast
     addNotification(
@@ -424,6 +486,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
         : r
     );
     saveReports(updated);
+    updateReportInSupabase(id, updatedData).catch(console.error);
 
     // Kích hoạt Bell Animation, Ripple và Notification, Toast
     addNotification(
@@ -438,6 +501,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     const target = reports.find((r) => r.id === id);
     const updated = reports.filter((r) => r.id !== id);
     saveReports(updated);
+    deleteReportFromSupabase(id).catch(console.error);
 
     // Kích hoạt Bell Animation, Ripple và Notification, Toast
     addNotification(
@@ -474,6 +538,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     });
 
     saveReports(updatedReports);
+    insertCommentToSupabase(newComment).catch(console.error);
 
     // Kích hoạt thông báo & toast
     addNotification(
@@ -487,11 +552,13 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const markAllNotificationsRead = () => {
     const updated = notifications.map((n) => ({ ...n, read: true }));
     saveNotifications(updated);
+    markAllNotificationsReadInSupabase().catch(console.error);
     showToast('Đã đánh dấu tất cả thông báo là đã đọc', 'info', '✔️');
   };
 
   const clearNotificationHistory = () => {
     saveNotifications([]);
+    clearNotificationsInSupabase().catch(console.error);
     showToast('Đã xóa toàn bộ lịch sử thông báo', 'info', '🧹');
   };
 
