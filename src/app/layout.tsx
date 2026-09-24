@@ -4,8 +4,8 @@ import { AppStoreProvider } from '@/data/store';
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: 'Cổng Báo Cáo Công Việc E-GOV • Trường ĐH Công Nghệ GTVT (UTT)',
-  description: 'Hệ thống báo cáo công việc hàng tuần trực tuyến của Trường Đại học Công nghệ Giao thông Vận tải (UTT)',
+  title: 'Cổng Báo Cáo Công Việc • Trường ĐH Công Nghệ GTVT (UTT)',
+  description: 'Hệ thống báo cáo công việc hàng tuần của Trường Đại học Công nghệ Giao thông Vận tải (UTT)',
   icons: {
     icon: '/utt-logo.png',
   },
