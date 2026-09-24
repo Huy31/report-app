@@ -29,6 +29,7 @@ export default function RootLayout({
       </head>
       <body>
         <AppStoreProvider>{children}</AppStoreProvider>
+        <Analytics />
       </body>
     </html>
   );
