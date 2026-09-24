@@ -3,13 +3,16 @@
 import React, { useState, useMemo } from 'react';
 import { X, UserPlus, User, Mail, Phone, Lock } from 'lucide-react';
 import { useAppStore } from '@/data/store';
+import { useRouter } from 'next/navigation';
 
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (registeredEmail: string) => void;
 }
 
-export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
+export default function RegisterModal({ isOpen, onClose, onSuccess }: RegisterModalProps) {
+  const router = useRouter();
   const { register, users } = useAppStore();
 
   const [fullName, setFullName] = useState('');
@@ -52,10 +55,11 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
       return;
     }
 
+    const registeredEmail = email.trim();
     const result = register({
       fullName: fullName.trim(),
       username: nextEmployeeCode,
-      email: email.trim(),
+      email: registeredEmail,
       phone: phone.trim(),
       department: 'Trường ĐH Công nghệ GTVT',
       role: 'staff',
@@ -63,7 +67,20 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
     });
 
     if (result.success) {
+      // Xóa trắng form đăng ký
+      setFullName('');
+      setEmail('');
+      setPhone('');
+      setPassword('');
+      setConfirmPassword('');
+      setError('');
+
+      // Đóng modal và chuyển thông tin email đã đăng ký về trang đăng nhập
       onClose();
+      if (onSuccess) {
+        onSuccess(registeredEmail);
+      }
+      router.push('/login');
     } else {
       setError(result.message);
     }

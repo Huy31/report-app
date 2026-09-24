@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   // If already logged in, redirect to dashboard
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     const res = login(email, password);
     if (res.success) {
@@ -111,6 +113,27 @@ export default function LoginPage() {
         {/* Form body */}
         <div style={{ padding: '24px 28px' }}>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {successMessage && (
+              <div
+                style={{
+                  backgroundColor: '#f0fdf4',
+                  border: '1px solid #86efac',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '13px',
+                  color: '#15803d',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  lineHeight: '1.4',
+                }}
+              >
+                <span style={{ fontSize: '16px' }}>🎉</span>
+                <span>{successMessage}</span>
+              </div>
+            )}
+
             {error && (
               <div
                 style={{
@@ -243,7 +266,16 @@ export default function LoginPage() {
       </div>
 
       {/* Register Modal */}
-      <RegisterModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
+        onSuccess={(registeredEmail) => {
+          setEmail(registeredEmail);
+          setPassword('');
+          setError('');
+          setSuccessMessage('Đăng ký tài khoản thành công! Vui lòng nhập mật khẩu để đăng nhập.');
+        }}
+      />
     </div>
   );
 }

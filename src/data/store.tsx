@@ -394,15 +394,12 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
     const updated = [...users, newUser];
     saveUsers(updated);
-    setCurrentUser(newUser);
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
-    }
 
+    // Không tự động đăng nhập - để nhân viên chuyển về trang login tự đăng nhập bằng tài khoản vừa tạo
     insertUserToSupabase(newUser).catch(console.error);
 
-    showToast(`Đăng ký thành công! Mã nhân viên của bạn là ${newUser.username}`, 'success', '🎉');
-    return { success: true, message: 'Đăng ký thành công!' };
+    showToast(`Đăng ký thành công! Mã nhân viên của bạn là ${newUser.username}. Vui lòng đăng nhập.`, 'success', '🎉');
+    return { success: true, message: `Đăng ký thành công! Mã nhân viên của bạn là ${newUser.username}. Vui lòng đăng nhập.` };
   };
 
   const logout = () => {
