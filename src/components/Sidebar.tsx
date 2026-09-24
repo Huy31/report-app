@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
   LayoutDashboard,
   Users,
-  RotateCcw,
   LogOut,
   X,
   UserCheck,
@@ -27,15 +26,8 @@ export default function Sidebar({
   onOpenStatsModal,
   onOpenProfileModal,
 }: SidebarProps) {
-  const { currentUser, logout, resetToDefault } = useAppStore();
+  const { currentUser, logout } = useAppStore();
   const [collapsed, setCollapsed] = useState(false);
-
-  const handleReset = () => {
-    if (window.confirm('Bạn có chắc chắn muốn khôi phục dữ liệu mẫu ban đầu của hệ thống không?')) {
-      resetToDefault();
-      if (isMobileOpen) onMobileClose();
-    }
-  };
 
   const W = collapsed ? '64px' : '260px';
 
@@ -322,29 +314,6 @@ export default function Sidebar({
               icon={<UserCheck size={18} color="#4ade80" />}
               label="Hồ Sơ Nhân Sự"
               onClick={() => { onOpenProfileModal(); if (isMobileOpen) onMobileClose(); }}
-            />
-
-            {!collapsed && (
-              <div
-                style={{
-                  fontSize: '11px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  color: '#64748b',
-                  padding: '12px 12px 4px',
-                  fontWeight: 700,
-                }}
-              >
-                Hệ thống
-              </div>
-            )}
-            {collapsed && <div style={{ height: '12px' }} />}
-
-            <NavButton
-              icon={<RotateCcw size={17} color="#fb923c" />}
-              label="Khôi Phục Mẫu Gốc"
-              color="#fb923c"
-              onClick={handleReset}
             />
           </nav>
 
