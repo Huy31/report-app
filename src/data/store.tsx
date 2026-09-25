@@ -102,6 +102,11 @@ interface AppStoreContextType {
   closeToast: () => void;
   showToast: (message: string, type?: 'success' | 'warning' | 'danger' | 'info', icon?: string) => void;
 
+  // Theme
+  sidebarTheme: 'dark' | 'light';
+  setSidebarTheme: (theme: 'dark' | 'light') => void;
+  toggleSidebarTheme: () => void;
+
   // Reset
   resetToDefault: () => void;
 }
@@ -113,6 +118,7 @@ const STORAGE_KEYS = {
   CURRENT_USER: 'egov_utt_current_user_v3',
   REPORTS: 'egov_utt_reports_v3',
   NOTIFICATIONS: 'egov_utt_notifications_v3',
+  SIDEBAR_THEME: 'egov_utt_sidebar_theme_v1',
 };
 
 export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
@@ -121,6 +127,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [reports, setReports] = useState<WorkReport[]>(() => sortReportsByDay(INITIAL_REPORTS));
   const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
+  const [sidebarTheme, setSidebarThemeState] = useState<'dark' | 'light'>('dark');
 
   // Khởi tạo tuần và năm theo thời gian thực (real-time)
   const initialRealtime = getCurrentRealtimeWeek();
@@ -138,6 +145,12 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       const realtimeNow = getCurrentRealtimeWeek();
       setSelectedWeek(realtimeNow.weekNumber);
       setSelectedYear(realtimeNow.year);
+
+      // Load sidebar theme preference
+      const savedTheme = localStorage.getItem(STORAGE_KEYS.SIDEBAR_THEME);
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        setSidebarThemeState(savedTheme);
+      }
 
       // Clear legacy localStorage auto-login key if exists
       localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
@@ -655,6 +668,19 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     showToast('Đã khôi phục dữ liệu hệ thống mặc định!', 'info', '🔄');
   };
 
+  const setSidebarTheme = (theme: 'dark' | 'light') => {
+    setSidebarThemeState(theme);
+    try {
+      localStorage.setItem(STORAGE_KEYS.SIDEBAR_THEME, theme);
+    } catch {
+      // ignore
+    }
+  };
+
+  const toggleSidebarTheme = () => {
+    setSidebarTheme(sidebarTheme === 'dark' ? 'light' : 'dark');
+  };
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -688,6 +714,9 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
         toast,
         closeToast,
         showToast,
+        sidebarTheme,
+        setSidebarTheme,
+        toggleSidebarTheme,
         resetToDefault,
       }}
     >
