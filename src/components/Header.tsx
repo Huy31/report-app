@@ -137,7 +137,7 @@ export default function Header({
           <span className="ticker-sep">✦</span>
           📋 Nộp báo cáo trước 17:00 mỗi ngày làm việc
           <span className="ticker-sep">✦</span>
-          📊 Theo dõi &amp; quản lý tiến độ công việc toàn trường
+          📊 Theo dõi &amp; quản lý tiến độ công việc
           <span className="ticker-sep">✦</span>
           ✨ Chúc Nhân viên một ngày làm việc hiệu quả!
           <span className="ticker-sep">✦</span>
