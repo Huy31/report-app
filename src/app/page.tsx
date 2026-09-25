@@ -67,6 +67,19 @@ export default function DashboardPage() {
   }
 
   const handleEdit = (report: WorkReport) => {
+    const isOwner = Boolean(
+      currentUser && (
+        report.authorId === currentUser.id ||
+        (report.authorCode && currentUser.username && report.authorCode.toLowerCase() === currentUser.username.toLowerCase())
+      )
+    );
+    const canModify = Boolean(isOwner || currentUser?.role === 'admin');
+
+    if (!canModify) {
+      showToast('Bạn chỉ có quyền chỉnh sửa báo cáo của chính mình!', 'danger', '⛔');
+      return;
+    }
+
     setEditingReport(report);
     setIsCreateModalOpen(true);
   };

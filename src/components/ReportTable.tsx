@@ -15,7 +15,7 @@ interface ReportTableProps {
 }
 
 export default function ReportTable({ onEditReport, onCommentReport }: ReportTableProps) {
-  const { reports, deleteReport, selectedWeek, selectedYear, selectedDay, showToast } = useAppStore();
+  const { reports, deleteReport, selectedWeek, selectedYear, selectedDay, showToast, currentUser } = useAppStore();
   const [selectedAttachmentReport, setSelectedAttachmentReport] = useState<WorkReport | null>(null);
 
   // Filter reports according to selected week, year, and day
@@ -155,7 +155,16 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                 </td>
               </tr>
             ) : (
-              sortedReports.map((report) => (
+              sortedReports.map((report) => {
+                const isOwner = Boolean(
+                  currentUser && (
+                    report.authorId === currentUser.id ||
+                    (report.authorCode && currentUser.username && report.authorCode.toLowerCase() === currentUser.username.toLowerCase())
+                  )
+                );
+                const canModify = Boolean(isOwner || currentUser?.role === 'admin');
+
+                return (
                 <tr
                   key={report.id}
                   style={{
@@ -317,7 +326,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                     </div>
                   </td>
 
-                  {/* Thao tác: Edit (vàng), Comment (cam), Delete (xám) matching Screenshot 2 */}
+                  {/* Thao tác: Edit (vàng), Comment (cam), Delete (xám) */}
                   <td
                     style={{
                       padding: '12px 6px',
@@ -326,25 +335,27 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                      {/* Edit */}
-                      <button
-                        type="button"
-                        onClick={() => onEditReport(report)}
-                        title="Chỉnh sửa báo cáo"
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#eab308',
-                          cursor: 'pointer',
-                          padding: '2px',
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Pencil size={15} />
-                      </button>
+                      {/* Edit: Chỉ hiển thị nếu là báo cáo cá nhân hoặc quản trị viên */}
+                      {canModify && (
+                        <button
+                          type="button"
+                          onClick={() => onEditReport(report)}
+                          title="Chỉnh sửa báo cáo"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#eab308',
+                            cursor: 'pointer',
+                            padding: '2px',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Pencil size={15} />
+                        </button>
+                      )}
 
-                      {/* Comment */}
+                      {/* Comment: Mọi người đều có thể trao đổi/bình luận */}
                       <button
                         type="button"
                         onClick={() => {
@@ -391,17 +402,20 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                         )}
                       </button>
 
-                      {/* Animated Delete Button matching the 8-frame storyboard */}
-                      <AnimatedDeleteButton
-                        size="sm"
-                        label="Delete"
-                        itemName={`báo cáo của ${report.authorName}`}
-                        onDelete={() => deleteReport(report.id)}
-                      />
+                      {/* Animated Delete Button: Chỉ hiển thị nếu là báo cáo cá nhân hoặc quản trị viên */}
+                      {canModify && (
+                        <AnimatedDeleteButton
+                          size="sm"
+                          label="Delete"
+                          itemName={`báo cáo của ${report.authorName}`}
+                          onDelete={() => deleteReport(report.id)}
+                        />
+                      )}
                     </div>
                   </td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>

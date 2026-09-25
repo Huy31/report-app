@@ -551,6 +551,22 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
   const updateReport = (id: string, updatedData: Partial<WorkReport>) => {
     const target = reports.find((r) => r.id === id);
+    if (!target) return;
+
+    // Kiểm tra quyền: Chỉ chủ sở hữu báo cáo hoặc quản trị viên mới được phép chỉnh sửa
+    const isOwner = Boolean(
+      currentUser && (
+        target.authorId === currentUser.id ||
+        (target.authorCode && currentUser.username && target.authorCode.toLowerCase() === currentUser.username.toLowerCase())
+      )
+    );
+    const canModify = Boolean(isOwner || currentUser?.role === 'admin');
+
+    if (!canModify) {
+      showToast('Bạn chỉ có quyền chỉnh sửa báo cáo của chính mình!', 'danger', '⛔');
+      return;
+    }
+
     const updated = reports.map((r) =>
       r.id === id
         ? {
@@ -574,6 +590,22 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteReport = (id: string) => {
     const target = reports.find((r) => r.id === id);
+    if (!target) return;
+
+    // Kiểm tra quyền: Chỉ chủ sở hữu báo cáo hoặc quản trị viên mới được phép xóa
+    const isOwner = Boolean(
+      currentUser && (
+        target.authorId === currentUser.id ||
+        (target.authorCode && currentUser.username && target.authorCode.toLowerCase() === currentUser.username.toLowerCase())
+      )
+    );
+    const canModify = Boolean(isOwner || currentUser?.role === 'admin');
+
+    if (!canModify) {
+      showToast('Bạn chỉ có quyền xóa báo cáo của chính mình!', 'danger', '⛔');
+      return;
+    }
+
     const updated = reports.filter((r) => r.id !== id);
     saveReports(updated);
     deleteReportFromSupabase(id).catch(console.error);
