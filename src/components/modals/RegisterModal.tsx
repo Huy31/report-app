@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (registeredEmail: string, message?: string) => void;
+  onSuccess?: (registeredEmail: string) => void;
 }
 
 export default function RegisterModal({ isOpen, onClose, onSuccess }: RegisterModalProps) {
@@ -21,7 +21,6 @@ export default function RegisterModal({ isOpen, onClose, onSuccess }: RegisterMo
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   // Tự động tính toán mã nhân viên tiếp theo theo định dạng NV001, NV002...
   const nextEmployeeCode = useMemo(() => {
@@ -37,7 +36,7 @@ export default function RegisterModal({ isOpen, onClose, onSuccess }: RegisterMo
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -56,41 +55,34 @@ export default function RegisterModal({ isOpen, onClose, onSuccess }: RegisterMo
       return;
     }
 
-    setLoading(true);
-    try {
-      const registeredEmail = email.trim();
-      const result = await register({
-        fullName: fullName.trim(),
-        username: nextEmployeeCode,
-        email: registeredEmail,
-        phone: phone.trim(),
-        department: 'Trường ĐH Công nghệ GTVT',
-        role: 'staff',
-        password,
-      });
+    const registeredEmail = email.trim();
+    const result = register({
+      fullName: fullName.trim(),
+      username: nextEmployeeCode,
+      email: registeredEmail,
+      phone: phone.trim(),
+      department: 'Trường ĐH Công nghệ GTVT',
+      role: 'staff',
+      password,
+    });
 
-      if (result.success) {
-        // Xóa trắng form đăng ký
-        setFullName('');
-        setEmail('');
-        setPhone('');
-        setPassword('');
-        setConfirmPassword('');
-        setError('');
+    if (result.success) {
+      // Xóa trắng form đăng ký
+      setFullName('');
+      setEmail('');
+      setPhone('');
+      setPassword('');
+      setConfirmPassword('');
+      setError('');
 
-        // Đóng modal và chuyển thông tin email đã đăng ký về trang đăng nhập
-        onClose();
-        if (onSuccess) {
-          onSuccess(registeredEmail, result.message);
-        }
-        router.push('/login');
-      } else {
-        setError(result.message);
+      // Đóng modal và chuyển thông tin email đã đăng ký về trang đăng nhập
+      onClose();
+      if (onSuccess) {
+        onSuccess(registeredEmail);
       }
-    } catch (err: any) {
-      setError(err?.message || 'Có lỗi xảy ra khi tạo tài khoản!');
-    } finally {
-      setLoading(false);
+      router.push('/login');
+    } else {
+      setError(result.message);
     }
   };
 
@@ -281,14 +273,9 @@ export default function RegisterModal({ isOpen, onClose, onSuccess }: RegisterMo
             </button>
             <button
               type="submit"
-              disabled={loading}
               className="btn btn-primary"
-              style={{
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
             >
-              {loading ? 'Đang tạo tài khoản...' : 'Tạo tài khoản mới'}
+              Tạo tài khoản mới
             </button>
           </div>
         </form>

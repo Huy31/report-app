@@ -2,7 +2,7 @@ import { type NextRequest } from "next/server";
 import { createClient } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  return await createClient(request);
+  return createClient(request);
 }
 
 export const config = {

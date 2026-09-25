@@ -16,11 +16,10 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -39,18 +38,11 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await changePassword(oldPassword, newPassword);
-      if (res.success) {
-        onClose();
-      } else {
-        setError(res.message);
-      }
-    } catch (err: any) {
-      setError(err?.message || 'Có lỗi xảy ra khi đổi mật khẩu!');
-    } finally {
-      setLoading(false);
+    const res = changePassword(oldPassword, newPassword);
+    if (res.success) {
+      onClose();
+    } else {
+      setError(res.message);
     }
   };
 
@@ -147,16 +139,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Hủy
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary"
-              style={{
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {loading ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+            <button type="submit" className="btn btn-primary">
+              Cập nhật mật khẩu
             </button>
           </div>
         </form>

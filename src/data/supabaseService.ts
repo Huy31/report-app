@@ -36,9 +36,10 @@ export async function fetchUsersFromSupabase(): Promise<User[] | null> {
 
 export async function insertUserToSupabase(user: User): Promise<boolean> {
   try {
-    const row: any = {
+    const { error } = await supabase.from('users').insert({
+      id: user.id,
       username: user.username,
-      password: user.password || '',
+      password: user.password,
       email: user.email,
       full_name: user.fullName,
       last_name: user.lastName || null,
@@ -54,18 +55,14 @@ export async function insertUserToSupabase(user: User): Promise<boolean> {
       department: user.department || 'Trường ĐH Công nghệ GTVT',
       role: user.role || 'staff',
       avatar_url: user.avatarUrl || null,
-    };
-    if (/^\d+$/.test(user.id)) {
-      row.id = parseInt(user.id, 10);
-    }
-    const { error } = await supabase.from('users').insert(row);
+    });
     return !error;
   } catch {
     return false;
   }
 }
 
-export async function updateUserInSupabase(idOrEmail: string, user: Partial<User>): Promise<boolean> {
+export async function updateUserInSupabase(id: string, user: Partial<User>): Promise<boolean> {
   try {
     const payload: any = {};
     if (user.fullName !== undefined) payload.full_name = user.fullName;
@@ -86,12 +83,7 @@ export async function updateUserInSupabase(idOrEmail: string, user: Partial<User
     if (user.password !== undefined) payload.password = user.password;
     if (user.email !== undefined) payload.email = user.email;
 
-    const query = supabase.from('users').update(payload);
-    if (idOrEmail.includes('@')) {
-      const { error } = await query.eq('email', idOrEmail);
-      return !error;
-    }
-    const { error } = await query.eq('id', idOrEmail);
+    const { error } = await supabase.from('users').update(payload).eq('id', id);
     return !error;
   } catch {
     return false;
