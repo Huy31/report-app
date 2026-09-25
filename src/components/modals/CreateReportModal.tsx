@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Save, UploadCloud, File, Trash2, Eye, Paperclip } from 'lucide-react';
+import { Save, UploadCloud, File, Trash2, Eye, Paperclip, X } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import { WorkReport, ReportAttachment } from '@/data/initialData';
 import { getWeeksInYear, AVAILABLE_YEARS, getDayOfWeekOrder, formatDayOfWeek, getDateOfDayInWeek, DAYS_OF_WEEK_LIST, getCurrentRealtimeWeek } from '@/utils/dateUtils';
@@ -174,7 +174,36 @@ export default function CreateReportModal({
             userSelect: 'none',
           }}
         >
-          <span>Tạo báo cáo</span>
+          <span>{reportToEdit ? 'Chỉnh sửa báo cáo' : 'Tạo báo cáo'}</span>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#ffffff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '4px',
+              borderRadius: '4px',
+              transition: 'background-color 0.15s, opacity 0.15s',
+              opacity: 0.9,
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.opacity = '1';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.opacity = '0.9';
+            }}
+            title="Đóng"
+            aria-label="Đóng"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Form Body */}
