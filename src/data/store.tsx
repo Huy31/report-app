@@ -24,6 +24,7 @@ import {
   markAllNotificationsReadInSupabase,
   clearNotificationsInSupabase,
 } from './supabaseService';
+import { getDayOfWeekOrder, getCurrentRealtimeWeek } from '@/utils/dateUtils';
 
 export interface ToastData {
   id: number;
@@ -31,6 +32,36 @@ export interface ToastData {
   type: 'success' | 'warning' | 'danger' | 'info';
   icon?: string;
 }
+
+/**
+ * Sorts an array of reports by:
+ * 1. year ascending
+ * 2. weekNumber ascending
+ * 3. dayOfWeek order: Thứ Hai (1) -> Thứ Ba (2) -> Thứ Tư (3) -> Thứ Năm (4) -> Thứ Sáu (5) -> Thứ Bảy (6) -> Chủ Nhật (7)
+ * 4. createdAt/date ascending
+ * 5. id fallback
+ */
+export const sortReportsByDay = (reps: WorkReport[]): WorkReport[] => {
+  return [...reps].sort((a, b) => {
+    if (a.year !== b.year) {
+      return a.year - b.year;
+    }
+    if (a.weekNumber !== b.weekNumber) {
+      return a.weekNumber - b.weekNumber;
+    }
+    const orderA = getDayOfWeekOrder(a.dayOfWeek, a.date);
+    const orderB = getDayOfWeekOrder(b.dayOfWeek, b.date);
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    const timeA = new Date(a.createdAt || a.date || 0).getTime();
+    const timeB = new Date(b.createdAt || b.date || 0).getTime();
+    if (timeA !== timeB) {
+      return timeA - timeB;
+    }
+    return (a.id || '').localeCompare(b.id || '');
+  });
+};
 
 interface AppStoreContextType {
   // Auth
@@ -88,11 +119,13 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
-  const [reports, setReports] = useState<WorkReport[]>(INITIAL_REPORTS);
+  const [reports, setReports] = useState<WorkReport[]>(() => sortReportsByDay(INITIAL_REPORTS));
   const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
 
-  const [selectedWeek, setSelectedWeek] = useState<number>(38);
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  // Khởi tạo tuần và năm theo thời gian thực (real-time)
+  const initialRealtime = getCurrentRealtimeWeek();
+  const [selectedWeek, setSelectedWeek] = useState<number>(initialRealtime.weekNumber);
+  const [selectedYear, setSelectedYear] = useState<number>(initialRealtime.year);
   const [selectedDay, setSelectedDay] = useState<string>('Tất cả');
 
   const [bellTriggerKey, setBellTriggerKey] = useState<number>(0);
@@ -101,6 +134,11 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   // Load from storage on client mount
   useEffect(() => {
     try {
+      // Tự động nhảy sang tuần và năm theo thời gian thực mỗi khi reload / mở trang
+      const realtimeNow = getCurrentRealtimeWeek();
+      setSelectedWeek(realtimeNow.weekNumber);
+      setSelectedYear(realtimeNow.year);
+
       // Clear legacy localStorage auto-login key if exists
       localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
 
@@ -149,7 +187,23 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const savedReports = localStorage.getItem(STORAGE_KEYS.REPORTS);
-      if (savedReports) setReports(JSON.parse(savedReports));
+      if (savedReports) {
+        try {
+          const parsed: WorkReport[] = JSON.parse(savedReports);
+          // Migration: Nếu có báo cáo cũ ngày 2026-09-21 bị gán nhầm weekNumber 38 thì chuẩn hóa về weekNumber 39
+          const normalized = parsed.map((r) => {
+            if (r.date && r.weekNumber === 38 && r.date >= '2026-09-21' && r.date <= '2026-09-27') {
+              return { ...r, weekNumber: 39 };
+            }
+            return r;
+          });
+          setReports(sortReportsByDay(normalized));
+        } catch {
+          setReports(sortReportsByDay(INITIAL_REPORTS));
+        }
+      } else {
+        setReports(sortReportsByDay(INITIAL_REPORTS));
+      }
 
       const savedNotifs = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
       if (savedNotifs) {
@@ -198,8 +252,9 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (remoteReports && remoteReports.length > 0) {
-          setReports(remoteReports);
-          localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(remoteReports));
+          const sorted = sortReportsByDay(remoteReports);
+          setReports(sorted);
+          localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(sorted));
         }
 
         if (remoteNotifs && remoteNotifs.length > 0) {
@@ -225,8 +280,9 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const saveReports = (newReports: WorkReport[]) => {
-    setReports(newReports);
-    localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(newReports));
+    const sorted = sortReportsByDay(newReports);
+    setReports(sorted);
+    localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(sorted));
   };
 
   const saveNotifications = (newNotifs: AppNotification[]) => {
@@ -610,6 +666,10 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       sessionStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
       localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
     }
+    const realtimeNow = getCurrentRealtimeWeek();
+    setSelectedWeek(realtimeNow.weekNumber);
+    setSelectedYear(realtimeNow.year);
+    setSelectedDay('Tất cả');
     saveReports(INITIAL_REPORTS);
     saveNotifications(INITIAL_NOTIFICATIONS);
     showToast('Đã khôi phục dữ liệu hệ thống mặc định!', 'info', '🔄');

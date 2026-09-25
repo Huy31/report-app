@@ -181,7 +181,7 @@ export const INITIAL_REPORTS: WorkReport[] = [
     department: 'Khoa Công nghệ Thông tin',
     dayOfWeek: 'Thứ Hai',
     date: '2026-09-21',
-    weekNumber: 38,
+    weekNumber: 39,
     year: 2026,
     currentWork: 'Hoàn thành thẩm định đề cương chi tiết học phần Lập trình Web nâng cao; Họp Hội đồng Khoa học định kỳ tháng 9.',
     nextWork: 'Rà soát bài giảng thực hành Cloud Computing; Tiếp nhận hồ sơ đồ án tốt nghiệp.',
@@ -204,7 +204,7 @@ export const INITIAL_REPORTS: WorkReport[] = [
     department: 'Khoa Công nghệ Thông tin',
     dayOfWeek: 'Thứ Hai',
     date: '2026-09-21',
-    weekNumber: 38,
+    weekNumber: 39,
     year: 2026,
     currentWork: `* Chỉnh sửa theo feedback: Thêm Animation mở đầu các screen, tinh chỉnh anim BG
 * Communication
@@ -229,7 +229,7 @@ export const INITIAL_REPORTS: WorkReport[] = [
     department: 'Phòng Quản trị Thiết bị',
     dayOfWeek: 'Thứ Hai',
     date: '2026-09-21',
-    weekNumber: 38,
+    weekNumber: 39,
     year: 2026,
     currentWork: 'Khảo sát hiện trạng thiết bị phòng họp trực tuyến; Bảo trì định kỳ máy in cơ quan.',
     nextWork: 'Phối hợp đơn vị kỹ thuật nâng cấp đường truyền phòng máy.',

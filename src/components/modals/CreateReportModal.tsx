@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Save, UploadCloud, File, Trash2, Eye, Paperclip } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import { WorkReport, ReportAttachment } from '@/data/initialData';
-import { getWeeksInYear, AVAILABLE_YEARS } from '@/utils/dateUtils';
+import { getWeeksInYear, AVAILABLE_YEARS, getDayOfWeekOrder, formatDayOfWeek, getDateOfDayInWeek, DAYS_OF_WEEK_LIST, getCurrentRealtimeWeek } from '@/utils/dateUtils';
 import { formatFileSize, getFileMetaDisplay, resolveReportAttachment } from '@/utils/fileHelpers';
 import RichTextEditor from '../RichTextEditor';
 import AttachmentDetailModal from './AttachmentDetailModal';
@@ -20,11 +20,12 @@ export default function CreateReportModal({
   onClose,
   reportToEdit,
 }: CreateReportModalProps) {
-  const { addReport, updateReport, selectedWeek, selectedYear } = useAppStore();
+  const { addReport, updateReport, selectedWeek, selectedYear, selectedDay } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [year, setYear] = useState<number>(selectedYear || 2026);
-  const [weekNumber, setWeekNumber] = useState<number>(selectedWeek || 38);
+  const [year, setYear] = useState<number>(selectedYear || getCurrentRealtimeWeek().year);
+  const [weekNumber, setWeekNumber] = useState<number>(selectedWeek || getCurrentRealtimeWeek().weekNumber);
+  const [dayOfWeek, setDayOfWeek] = useState<string>('Thứ Hai');
 
   // Dynamically compute all weeks for selected year
   const weeks = useMemo(() => getWeeksInYear(year), [year]);
@@ -40,6 +41,7 @@ export default function CreateReportModal({
     if (reportToEdit) {
       setYear(reportToEdit.year);
       setWeekNumber(reportToEdit.weekNumber);
+      setDayOfWeek(formatDayOfWeek(reportToEdit.dayOfWeek) || 'Thứ Hai');
       setCurrentWork(reportToEdit.currentWork || '');
       setNextWork(reportToEdit.nextWork || '');
       setProposal(reportToEdit.proposal || '');
@@ -47,8 +49,13 @@ export default function CreateReportModal({
       setAttachment(existingAttachment);
       setAttachedFile(reportToEdit.attachedFile || existingAttachment?.name || '');
     } else {
-      setYear(selectedYear || 2026);
-      setWeekNumber(selectedWeek || 38);
+      const realtime = getCurrentRealtimeWeek();
+      setYear(selectedYear || realtime.year);
+      setWeekNumber(selectedWeek || realtime.weekNumber);
+      const daysMap = ['Thứ Hai', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      const todayDay = daysMap[new Date().getDay()];
+      const initialDay = selectedDay && selectedDay !== 'Tất cả' && selectedDay !== 'Chủ Nhật' ? selectedDay : todayDay;
+      setDayOfWeek(initialDay);
       setCurrentWork('');
       setNextWork('');
       setProposal('');
@@ -56,7 +63,7 @@ export default function CreateReportModal({
       setAttachment(null);
     }
     setError('');
-  }, [reportToEdit, isOpen, selectedWeek, selectedYear]);
+  }, [reportToEdit, isOpen, selectedWeek, selectedYear, selectedDay]);
 
   if (!isOpen) return null;
 
@@ -107,12 +114,12 @@ export default function CreateReportModal({
       return;
     }
 
-    const todayDate = new Date().toISOString().split('T')[0];
-    const daysMap = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-    const currentDayOfWeek = daysMap[new Date().getDay()];
+    const reportDate = getDateOfDayInWeek(year, weekNumber, dayOfWeek);
 
     if (reportToEdit) {
       updateReport(reportToEdit.id, {
+        dayOfWeek,
+        date: reportDate,
         year,
         weekNumber,
         currentWork: currentWork.trim(),
@@ -123,8 +130,8 @@ export default function CreateReportModal({
       });
     } else {
       addReport({
-        dayOfWeek: currentDayOfWeek,
-        date: todayDate,
+        dayOfWeek,
+        date: reportDate,
         weekNumber,
         year,
         currentWork: currentWork.trim(),
@@ -199,9 +206,9 @@ export default function CreateReportModal({
             </div>
           )}
 
-          {/* Row 1: Chọn năm & Tuần báo cáo */}
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1 1 200px' }}>
+          {/* Row 1: Chọn năm & Tuần báo cáo & Chọn thứ */}
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 140px' }}>
               <label
                 style={{
                   display: 'block',
@@ -243,7 +250,7 @@ export default function CreateReportModal({
               </select>
             </div>
 
-            <div style={{ flex: '2 1 320px' }}>
+            <div style={{ flex: '2 1 240px' }}>
               <label
                 style={{
                   display: 'block',
@@ -273,6 +280,41 @@ export default function CreateReportModal({
                 {weeks.map((w) => (
                   <option key={w.weekNumber} value={w.weekNumber}>
                     {w.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ flex: '1 1 160px' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '13.5px',
+                  fontWeight: 700,
+                  color: '#262626',
+                  marginBottom: '6px',
+                }}
+              >
+                Chọn thứ
+              </label>
+              <select
+                value={dayOfWeek}
+                onChange={(e) => setDayOfWeek(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {DAYS_OF_WEEK_LIST.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
                   </option>
                 ))}
               </select>

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Pencil, MessageSquare, Trash2, FileText, File } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import { WorkReport } from '@/data/initialData';
 import { resolveReportAttachment, getFileMetaDisplay, getFileExtension, formatFileSize } from '@/utils/fileHelpers';
+import { getDayOfWeekOrder, formatDayOfWeek } from '@/utils/dateUtils';
 import AnimatedDeleteButton from './AnimatedDeleteButton';
 import AttachmentDetailModal from './modals/AttachmentDetailModal';
 
@@ -17,13 +18,35 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
   const { reports, deleteReport, selectedWeek, selectedYear, selectedDay, showToast } = useAppStore();
   const [selectedAttachmentReport, setSelectedAttachmentReport] = useState<WorkReport | null>(null);
 
-  // Filter reports
+  // Filter reports according to selected week, year, and day
   const filteredReports = reports.filter((report) => {
     const matchWeek = report.weekNumber === selectedWeek;
     const matchYear = report.year === selectedYear;
     const matchDay = selectedDay === 'Tất cả' || report.dayOfWeek === selectedDay;
     return matchWeek && matchYear && matchDay;
   });
+
+  // Sort reports according to day of week order:
+  // Thứ Hai (1) -> Thứ Ba (2) -> Thứ Tư (3) -> Thứ Năm (4) -> Thứ Sáu (5) -> Thứ Bảy (6) -> Chủ Nhật (7)
+  const sortedReports = useMemo(() => {
+    return [...filteredReports].sort((a, b) => {
+      const orderA = getDayOfWeekOrder(a.dayOfWeek, a.date);
+      const orderB = getDayOfWeekOrder(b.dayOfWeek, b.date);
+
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+
+      // If on the same day, sort chronologically by createdAt / date (earlier reports first)
+      const timeA = new Date(a.createdAt || a.date || 0).getTime();
+      const timeB = new Date(b.createdAt || b.date || 0).getTime();
+      if (timeA !== timeB) {
+        return timeA - timeB;
+      }
+
+      return (a.id || '').localeCompare(b.id || '');
+    });
+  }, [filteredReports]);
 
   const handleDelete = (id: string, name: string) => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa báo cáo của "${name}" không?`)) {
@@ -144,7 +167,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
           </thead>
 
           <tbody>
-            {filteredReports.length === 0 ? (
+            {sortedReports.length === 0 ? (
               <tr>
                 <td colSpan={8} style={{ padding: '40px 20px', textAlign: 'center', color: '#64748b' }}>
                   <FileText size={36} color="#cbd5e1" style={{ margin: '0 auto 8px', display: 'block' }} />
@@ -152,7 +175,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                 </td>
               </tr>
             ) : (
-              filteredReports.map((report) => (
+              sortedReports.map((report) => (
                 <tr
                   key={report.id}
                   style={{
@@ -169,9 +192,10 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                       textAlign: 'center',
                       padding: '12px 6px',
                       fontSize: '12.5px',
+                      lineHeight: '1.3',
                     }}
                   >
-                    {report.dayOfWeek?.replace('Thứ ', 'Thứ ') || 'T2'}
+                    {formatDayOfWeek(report.dayOfWeek)}
                   </td>
 
                   {/* Họ và tên */}
