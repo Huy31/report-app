@@ -158,7 +158,7 @@ export default function LoginPage() {
                 <Mail size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '11px' }} />
                 <input
                   type="email"
-                  placeholder="VD: Nhập email của bạn"
+                  placeholder="Nhập email của bạn"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
