@@ -76,10 +76,10 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const combinedFullName = `${lastName} ${firstName}`.trim();
-    updateProfile({
+    await updateProfile({
       lastName,
       firstName,
       fullName: combinedFullName || currentUser.fullName,

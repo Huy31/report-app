@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // If already logged in, redirect to dashboard
   useEffect(() => {
@@ -24,16 +25,23 @@ export default function LoginPage() {
     }
   }, [isInitialized, currentUser, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
+    setLoading(true);
 
-    const res = login(email, password);
-    if (res.success) {
-      router.push('/');
-    } else {
-      setError(res.message || 'Đăng nhập không thành công!');
+    try {
+      const res = await login(email, password);
+      if (res.success) {
+        router.push('/');
+      } else {
+        setError(res.message || 'Đăng nhập không thành công!');
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Có lỗi xảy ra khi kết nối máy chủ!');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -215,17 +223,20 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={loading}
               className="btn btn-primary"
               style={{
                 width: '100%',
                 padding: '11px',
                 fontSize: '14.5px',
                 marginTop: '4px',
-                backgroundColor: '#a11f24',
+                backgroundColor: loading ? '#9ca3af' : '#a11f24',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.8 : 1,
               }}
             >
               <LogIn size={18} />
-              <span>ĐĂNG NHẬP HỆ THỐNG</span>
+              <span>{loading ? 'ĐANG ĐĂNG NHẬP...' : 'ĐĂNG NHẬP HỆ THỐNG'}</span>
             </button>
           </form>
 
@@ -269,11 +280,11 @@ export default function LoginPage() {
       <RegisterModal
         isOpen={isRegisterOpen}
         onClose={() => setIsRegisterOpen(false)}
-        onSuccess={(registeredEmail) => {
+        onSuccess={(registeredEmail, successMsg) => {
           setEmail(registeredEmail);
           setPassword('');
           setError('');
-          setSuccessMessage('Đăng ký tài khoản thành công! Vui lòng nhập mật khẩu để đăng nhập.');
+          setSuccessMessage(successMsg || 'Đăng ký tài khoản thành công! Vui lòng nhập mật khẩu để đăng nhập.');
         }}
       />
     </div>
