@@ -19,8 +19,7 @@ import { FileCheck, Users, Clock, AlertCircle } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { reports, users, selectedWeek, selectedYear, showToast, currentUser, isInitialized, theme } = useAppStore();
-  const isDark = theme === 'dark';
+  const { reports, users, selectedWeek, selectedYear, showToast, currentUser, isInitialized } = useAppStore();
 
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -89,15 +88,7 @@ export default function DashboardPage() {
   const totalUsers = users.length;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        backgroundColor: isDark ? '#0b1120' : '#f8fafc',
-        color: isDark ? '#f8fafc' : '#0f172a',
-        transition: 'background-color 0.2s ease, color 0.2s ease',
-      }}
-    >
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       {/* 1. Sidebar */}
       <Sidebar
         isMobileOpen={isSidebarMobileOpen}

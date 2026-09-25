@@ -5,8 +5,7 @@ import { CheckCircle2, AlertTriangle, XCircle, Info, X } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 
 export default function Toast() {
-  const { toast, closeToast, theme } = useAppStore();
-  const isDark = theme === 'dark';
+  const { toast, closeToast } = useAppStore();
 
   useEffect(() => {
     if (toast) {
@@ -23,31 +22,31 @@ export default function Toast() {
     switch (toast.type) {
       case 'success':
         return {
-          bg: isDark ? '#064e3b' : '#f0fdf4',
-          border: isDark ? '#059669' : '#bbf7d0',
-          color: isDark ? '#a7f3d0' : '#15803d',
-          icon: <CheckCircle2 size={20} color={isDark ? '#34d399' : '#16a34a'} />,
+          bg: '#f0fdf4',
+          border: '#bbf7d0',
+          color: '#15803d',
+          icon: <CheckCircle2 size={20} color="#16a34a" />,
         };
       case 'warning':
         return {
-          bg: isDark ? '#78350f' : '#fffbeb',
-          border: isDark ? '#d97706' : '#fde68a',
-          color: isDark ? '#fde68a' : '#b45309',
-          icon: <AlertTriangle size={20} color={isDark ? '#fbbf24' : '#d97706'} />,
+          bg: '#fffbeb',
+          border: '#fde68a',
+          color: '#b45309',
+          icon: <AlertTriangle size={20} color="#d97706" />,
         };
       case 'danger':
         return {
-          bg: isDark ? '#7f1d1d' : '#fef2f2',
-          border: isDark ? '#dc2626' : '#fecaca',
-          color: isDark ? '#fecaca' : '#b91c1c',
-          icon: <XCircle size={20} color={isDark ? '#f87171' : '#dc2626'} />,
+          bg: '#fef2f2',
+          border: '#fecaca',
+          color: '#b91c1c',
+          icon: <XCircle size={20} color="#dc2626" />,
         };
       default:
         return {
-          bg: isDark ? '#1e3a8a' : '#eff6ff',
-          border: isDark ? '#2563eb' : '#bfdbfe',
-          color: isDark ? '#bfdbfe' : '#1d4ed8',
-          icon: <Info size={20} color={isDark ? '#60a5fa' : '#2563eb'} />,
+          bg: '#eff6ff',
+          border: '#bfdbfe',
+          color: '#1d4ed8',
+          icon: <Info size={20} color="#2563eb" />,
         };
     }
   };

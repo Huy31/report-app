@@ -9,8 +9,6 @@ import {
   UserCheck,
   ChevronLeft,
   ChevronRight,
-  Sun,
-  Moon,
 } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import UttLogo from './UttLogo';
@@ -28,10 +26,9 @@ export default function Sidebar({
   onOpenStatsModal,
   onOpenProfileModal,
 }: SidebarProps) {
-  const { currentUser, logout, sidebarTheme, setSidebarTheme } = useAppStore();
+  const { currentUser, logout } = useAppStore();
   const [collapsed, setCollapsed] = useState(false);
 
-  const isLight = sidebarTheme === 'light';
   const W = collapsed ? '64px' : '260px';
 
   /* ── Nav item helper ── */
@@ -59,7 +56,7 @@ export default function Sidebar({
         padding: collapsed ? '10px 0' : '10px 14px',
         justifyContent: collapsed ? 'center' : 'flex-start',
         borderRadius: '8px',
-        color: active ? '#ffffff' : (color || (isLight ? '#334155' : '#cbd5e1')),
+        color: color || '#cbd5e1',
         fontSize: '13.5px',
         fontWeight: active ? 700 : 500,
         textAlign: 'left',
@@ -73,7 +70,7 @@ export default function Sidebar({
         border: 'none',
       }}
       onMouseOver={(e) => {
-        if (!active) e.currentTarget.style.backgroundColor = isLight ? '#f1f5f9' : '#334155';
+        if (!active) e.currentTarget.style.backgroundColor = '#334155';
       }}
       onMouseOut={(e) => {
         if (!active) e.currentTarget.style.backgroundColor = 'transparent';
@@ -121,14 +118,12 @@ export default function Sidebar({
           style={{
             width: '100%',
             height: '100%',
-            backgroundColor: isLight ? '#ffffff' : '#1e293b',
-            color: isLight ? '#0f172a' : '#f8fafc',
+            backgroundColor: '#1e293b',
+            color: '#f8fafc',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            boxShadow: isLight ? '2px 0 12px rgba(0, 0, 0, 0.06)' : '2px 0 8px rgba(0, 0, 0, 0.15)',
-            borderRight: isLight ? '1px solid #e2e8f0' : 'none',
-            transition: 'background-color 0.2s, color 0.2s, border-color 0.2s',
+            boxShadow: '2px 0 8px rgba(0, 0, 0, 0.15)',
           }}
         >
           {/* Responsive CSS */}
@@ -167,16 +162,16 @@ export default function Sidebar({
           <div
             style={{
               padding: collapsed ? '16px 0' : '16px 20px',
-              borderBottom: isLight ? '1px solid #e2e8f0' : '1px solid #334155',
+              borderBottom: '1px solid #334155',
               display: 'flex',
               alignItems: 'center',
               justifyContent: collapsed ? 'center' : 'space-between',
-              backgroundColor: isLight ? '#f8fafc' : '#0f172a',
+              backgroundColor: '#0f172a',
               flexShrink: 0,
-              transition: 'padding 0.25s, background-color 0.2s, border-color 0.2s',
+              transition: 'padding 0.25s',
             }}
           >
-            {!collapsed && <UttLogo size="sm" variant={isLight ? 'light' : 'dark'} />}
+            {!collapsed && <UttLogo size="sm" variant="dark" />}
             {collapsed && (
               <div
                 style={{
@@ -204,15 +199,7 @@ export default function Sidebar({
                 onClick={onMobileClose}
                 className="mobile-close-btn"
                 aria-label="Đóng menu"
-                style={{
-                  color: isLight ? '#64748b' : '#94a3b8',
-                  padding: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
+                style={{ color: '#94a3b8', padding: '4px', display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 <X size={20} />
               </button>
@@ -224,13 +211,13 @@ export default function Sidebar({
             <div
               style={{
                 padding: collapsed ? '12px 0' : '14px 20px',
-                borderBottom: isLight ? '1px solid #e2e8f0' : '1px solid #334155',
+                borderBottom: '1px solid #334155',
                 display: 'flex',
                 alignItems: 'center',
                 gap: collapsed ? 0 : '12px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                backgroundColor: isLight ? '#ffffff' : '#1e293b',
-                transition: 'padding 0.25s, background-color 0.2s, border-color 0.2s',
+                backgroundColor: '#1e293b',
+                transition: 'padding 0.25s',
                 flexShrink: 0,
                 overflow: 'hidden',
               }}
@@ -249,7 +236,7 @@ export default function Sidebar({
                   fontWeight: 800,
                   fontSize: '15px',
                   flexShrink: 0,
-                  border: isLight ? '2px solid #fed7aa' : '2px solid #fdba74',
+                  border: '2px solid #fdba74',
                   overflow: 'hidden',
                 }}
               >
@@ -269,7 +256,7 @@ export default function Sidebar({
                     style={{
                       fontSize: '13.5px',
                       fontWeight: 700,
-                      color: isLight ? '#0f172a' : '#f8fafc',
+                      color: '#f8fafc',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -281,7 +268,7 @@ export default function Sidebar({
                     style={{
                       fontSize: '11.5px',
                       fontWeight: 600,
-                      color: isLight ? '#ea580c' : '#fb923c',
+                      color: '#fb923c',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -303,7 +290,7 @@ export default function Sidebar({
                   fontSize: '11px',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
-                  color: isLight ? '#94a3b8' : '#64748b',
+                  color: '#64748b',
                   padding: '4px 12px',
                   fontWeight: 700,
                 }}
@@ -319,12 +306,12 @@ export default function Sidebar({
               active
             />
             <NavButton
-              icon={<Users size={18} color={isLight ? '#0284c7' : '#38bdf8'} />}
+              icon={<Users size={18} color="#38bdf8" />}
               label="Thống Kê Chưa Báo Cáo"
               onClick={() => { onOpenStatsModal(); if (isMobileOpen) onMobileClose(); }}
             />
             <NavButton
-              icon={<UserCheck size={18} color={isLight ? '#16a34a' : '#4ade80'} />}
+              icon={<UserCheck size={18} color="#4ade80" />}
               label="Hồ Sơ Nhân Sự"
               onClick={() => { onOpenProfileModal(); if (isMobileOpen) onMobileClose(); }}
             />
@@ -333,128 +320,14 @@ export default function Sidebar({
           {/* ── Footer ── */}
           <div
             style={{
-              padding: collapsed ? '14px 8px' : '14px 16px',
-              borderTop: isLight ? '1px solid #e2e8f0' : '1px solid #334155',
+              padding: collapsed ? '16px 8px' : '16px',
+              borderTop: '1px solid #334155',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
+              gap: '8px',
               flexShrink: 0,
-              backgroundColor: isLight ? '#f8fafc' : 'transparent',
-              transition: 'border-color 0.2s, background-color 0.2s',
             }}
           >
-            {/* ── Theme Switcher ── */}
-            <div>
-              {!collapsed && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    fontSize: '10.5px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.6px',
-                    color: isLight ? '#64748b' : '#94a3b8',
-                    marginBottom: '6px',
-                    padding: '0 2px',
-                  }}
-                >
-                  <span>Giao diện</span>
-                  <span style={{ fontSize: '10.5px', fontWeight: 600, color: isLight ? '#ea580c' : '#fb923c' }}>
-                    {isLight ? 'Sáng' : 'Tối'}
-                  </span>
-                </div>
-              )}
-
-              {!collapsed ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    backgroundColor: isLight ? '#e2e8f0' : '#0f172a',
-                    borderRadius: '8px',
-                    padding: '3px',
-                    border: isLight ? '1px solid #cbd5e1' : '1px solid #334155',
-                    gap: '3px',
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setSidebarTheme('light')}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      padding: '6px 10px',
-                      borderRadius: '6px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: isLight ? 700 : 500,
-                      backgroundColor: isLight ? '#ffffff' : 'transparent',
-                      color: isLight ? '#a11f24' : '#94a3b8',
-                      boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                    }}
-                    title="Chuyển sang giao diện Sáng"
-                  >
-                    <Sun size={14} color={isLight ? '#ea580c' : '#94a3b8'} />
-                    <span>Sáng</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSidebarTheme('dark')}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      padding: '6px 10px',
-                      borderRadius: '6px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: !isLight ? 700 : 500,
-                      backgroundColor: !isLight ? '#334155' : 'transparent',
-                      color: !isLight ? '#f8fafc' : '#64748b',
-                      boxShadow: !isLight ? '0 1px 3px rgba(0,0,0,0.25)' : 'none',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                    }}
-                    title="Chuyển sang giao diện Tối"
-                  >
-                    <Moon size={14} color={!isLight ? '#38bdf8' : '#64748b'} />
-                    <span>Tối</span>
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setSidebarTheme(isLight ? 'dark' : 'light')}
-                  title={isLight ? 'Đổi sang giao diện Tối' : 'Đổi sang giao diện Sáng'}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '100%',
-                    height: '36px',
-                    borderRadius: '8px',
-                    border: isLight ? '1px solid #cbd5e1' : '1px solid #334155',
-                    backgroundColor: isLight ? '#ffffff' : '#0f172a',
-                    color: isLight ? '#ea580c' : '#38bdf8',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {isLight ? <Sun size={17} /> : <Moon size={17} />}
-                </button>
-              )}
-            </div>
-
-            {/* Logout button */}
             <button
               type="button"
               onClick={() => { logout(); if (isMobileOpen) onMobileClose(); }}
@@ -466,24 +339,24 @@ export default function Sidebar({
                 gap: collapsed ? 0 : '10px',
                 padding: '9px 12px',
                 borderRadius: '6px',
-                color: isLight ? '#dc2626' : '#f87171',
-                backgroundColor: isLight ? '#fee2e2' : '#451a1a',
-                border: isLight ? '1px solid #fecaca' : 'none',
+                color: '#f87171',
+                backgroundColor: '#451a1a',
                 fontSize: '13px',
                 fontWeight: 600,
                 width: '100%',
                 cursor: 'pointer',
-                transition: 'background-color 0.15s, color 0.15s',
+                border: 'none',
+                transition: 'background-color 0.15s',
               }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = isLight ? '#fca5a5' : '#5c2222')}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = isLight ? '#fee2e2' : '#451a1a')}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#5c2222')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#451a1a')}
             >
               <LogOut size={16} />
               {!collapsed && <span>Đăng Xuất</span>}
             </button>
 
             {!collapsed && (
-              <div style={{ textAlign: 'center', fontSize: '10.5px', color: isLight ? '#94a3b8' : '#64748b', marginTop: '2px' }}>
+              <div style={{ textAlign: 'center', fontSize: '10.5px', color: '#64748b', marginTop: '4px' }}>
                 © 2026 EGOV • ĐH CÔNG NGHỆ GTVT
               </div>
             )}
@@ -504,25 +377,25 @@ export default function Sidebar({
             width: '26px',
             height: '26px',
             borderRadius: '50%',
-            backgroundColor: isLight ? '#ffffff' : '#0f172a',
-            border: isLight ? '2px solid #cbd5e1' : '2px solid #334155',
-            color: isLight ? '#64748b' : '#94a3b8',
+            backgroundColor: '#0f172a',
+            border: '2px solid #334155',
+            color: '#94a3b8',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             zIndex: 1070,
             transition: 'background-color 0.15s, color 0.15s',
-            boxShadow: isLight ? '0 2px 8px rgba(0,0,0,0.1)' : '0 2px 6px rgba(0,0,0,0.3)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
             flexShrink: 0,
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = isLight ? '#f8fafc' : '#1e3a5f';
-            e.currentTarget.style.color = isLight ? '#ea580c' : '#38bdf8';
+            e.currentTarget.style.backgroundColor = '#1e3a5f';
+            e.currentTarget.style.color = '#38bdf8';
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = isLight ? '#ffffff' : '#0f172a';
-            e.currentTarget.style.color = isLight ? '#64748b' : '#94a3b8';
+            e.currentTarget.style.backgroundColor = '#0f172a';
+            e.currentTarget.style.color = '#94a3b8';
           }}
         >
           {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}

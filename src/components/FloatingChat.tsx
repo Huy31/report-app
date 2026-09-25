@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, Sparkles, Bot } from 'lucide-react';
-import { useAppStore } from '@/data/store';
 
 interface ChatMessage {
   id: string;
@@ -17,8 +16,6 @@ const STORAGE_KEYS = {
 };
 
 export default function FloatingChat() {
-  const { theme } = useAppStore();
-  const isDark = theme === 'dark';
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -236,16 +233,15 @@ export default function FloatingChat() {
             maxWidth: 'calc(100vw - 40px)',
             height: '430px',
             maxHeight: 'calc(100vh - 120px)',
-            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+            backgroundColor: '#ffffff',
             borderRadius: '16px',
-            boxShadow: isDark ? '0 20px 35px -5px rgba(0, 0, 0, 0.6), 0 10px 15px -5px rgba(0, 0, 0, 0.4)' : '0 20px 35px -5px rgba(0, 0, 0, 0.2), 0 10px 15px -5px rgba(0, 0, 0, 0.1)',
-            border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+            boxShadow: '0 20px 35px -5px rgba(0, 0, 0, 0.2), 0 10px 15px -5px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e2e8f0',
             zIndex: 1050,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             animation: 'chatSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-            transition: 'background-color 0.2s, border-color 0.2s',
           }}
         >
           <style>{`
@@ -325,7 +321,7 @@ export default function FloatingChat() {
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
-              backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+              backgroundColor: '#f8fafc',
             }}
           >
             {/* Daily greeting banner */}
@@ -341,11 +337,11 @@ export default function FloatingChat() {
                   alignItems: 'center',
                   gap: '5px',
                   fontSize: '11px',
-                  color: isDark ? '#cbd5e1' : '#64748b',
-                  backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                  color: '#64748b',
+                  backgroundColor: '#ffffff',
                   padding: '3px 10px',
                   borderRadius: '12px',
-                  border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+                  border: '1px solid #e2e8f0',
                   fontWeight: 600,
                 }}
               >
@@ -367,14 +363,14 @@ export default function FloatingChat() {
               >
                 <div
                   style={{
-                    backgroundColor: m.sender === 'user' ? '#a11f24' : (isDark ? '#1e293b' : '#ffffff'),
-                    color: m.sender === 'user' ? '#ffffff' : (isDark ? '#f8fafc' : '#1e293b'),
+                    backgroundColor: m.sender === 'user' ? '#a11f24' : '#ffffff',
+                    color: m.sender === 'user' ? '#ffffff' : '#1e293b',
                     padding: '9px 13px',
                     borderRadius: m.sender === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
                     fontSize: '12.5px',
                     lineHeight: '1.45',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
-                    border: m.sender === 'user' ? 'none' : (isDark ? '1px solid #334155' : '1px solid #e2e8f0'),
+                    border: m.sender === 'user' ? 'none' : '1px solid #e2e8f0',
                     wordBreak: 'break-word',
                   }}
                 >
@@ -402,9 +398,9 @@ export default function FloatingChat() {
             onSubmit={handleSend}
             style={{
               display: 'flex',
-              borderTop: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+              borderTop: '1px solid #e2e8f0',
               padding: '8px 10px',
-              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+              backgroundColor: '#ffffff',
               alignItems: 'center',
               gap: '6px',
             }}
@@ -417,22 +413,21 @@ export default function FloatingChat() {
               style={{
                 flex: 1,
                 padding: '8px 12px',
-                border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+                border: '1px solid #e2e8f0',
                 borderRadius: '8px',
                 outline: 'none',
                 fontSize: '12.5px',
-                backgroundColor: isDark ? '#0f172a' : '#f8fafc',
-                color: isDark ? '#f8fafc' : '#1e293b',
+                backgroundColor: '#f8fafc',
                 transition: 'border-color 0.15s',
               }}
               onFocus={(e) => (e.currentTarget.style.borderColor = '#ea580c')}
-              onBlur={(e) => (e.currentTarget.style.borderColor = isDark ? '#334155' : '#e2e8f0')}
+              onBlur={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             />
             <button
               type="submit"
               disabled={!input.trim()}
               style={{
-                backgroundColor: input.trim() ? '#ea580c' : (isDark ? '#475569' : '#cbd5e1'),
+                backgroundColor: input.trim() ? '#ea580c' : '#cbd5e1',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '8px',

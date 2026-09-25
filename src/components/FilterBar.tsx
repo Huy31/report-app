@@ -19,10 +19,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
     selectedDay,
     setSelectedDay,
     showToast,
-    theme,
   } = useAppStore();
-
-  const isDark = theme === 'dark';
 
   // Dynamically compute all weeks for the selected year
   const weeks = useMemo(() => getWeeksInYear(selectedYear), [selectedYear]);
@@ -44,11 +41,6 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
       showToast('Lưu ý: Mỗi ngày cần viết báo cáo vì dữ liệu hiển thị theo ngày tạo báo cáo. Hôm nay không thể tạo báo cáo bù cho hôm qua.', 'warning', '⚠️');
     }
   };
-
-  const labelColor = isDark ? '#cbd5e1' : '#1f2937';
-  const selectBg = isDark ? '#1e293b' : '#ffffff';
-  const selectColor = isDark ? '#f8fafc' : '#1e293b';
-  const selectBorder = isDark ? '1px solid #334155' : '1px solid #cbd5e1';
 
   return (
     <div className="filter-bar-container">
@@ -111,7 +103,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             display: 'block',
             fontSize: '12.5px',
             fontWeight: 700,
-            color: labelColor,
+            color: '#1f2937',
             marginBottom: '4px',
           }}
         >
@@ -132,15 +124,14 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             height: '36px',
             padding: '4px 10px',
             borderRadius: '4px',
-            border: selectBorder,
+            border: '1px solid #cbd5e1',
             fontSize: '13px',
             fontWeight: 500,
-            color: selectColor,
-            backgroundColor: selectBg,
+            color: '#1e293b',
+            backgroundColor: '#ffffff',
             outline: 'none',
             minWidth: '130px',
             cursor: 'pointer',
-            transition: 'background-color 0.2s, color 0.2s, border-color 0.2s',
           }}
         >
           {AVAILABLE_YEARS.map((y) => (
@@ -158,7 +149,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             display: 'block',
             fontSize: '12.5px',
             fontWeight: 700,
-            color: labelColor,
+            color: '#1f2937',
             marginBottom: '4px',
           }}
         >
@@ -172,15 +163,14 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             height: '36px',
             padding: '4px 10px',
             borderRadius: '4px',
-            border: selectBorder,
+            border: '1px solid #cbd5e1',
             fontSize: '13px',
             fontWeight: 500,
-            color: selectColor,
-            backgroundColor: selectBg,
+            color: '#1e293b',
+            backgroundColor: '#ffffff',
             outline: 'none',
             minWidth: '140px',
             cursor: 'pointer',
-            transition: 'background-color 0.2s, color 0.2s, border-color 0.2s',
           }}
         >
           {daysOfWeek.map((d) => (
@@ -198,7 +188,7 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             display: 'block',
             fontSize: '12.5px',
             fontWeight: 700,
-            color: labelColor,
+            color: '#1f2937',
             marginBottom: '4px',
           }}
         >
@@ -212,15 +202,14 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             height: '36px',
             padding: '4px 10px',
             borderRadius: '4px',
-            border: selectBorder,
+            border: '1px solid #cbd5e1',
             fontSize: '13px',
             fontWeight: 500,
-            color: selectColor,
-            backgroundColor: selectBg,
+            color: '#1e293b',
+            backgroundColor: '#ffffff',
             outline: 'none',
             minWidth: '280px',
             cursor: 'pointer',
-            transition: 'background-color 0.2s, color 0.2s, border-color 0.2s',
           }}
         >
           {weeks.map((w) => (
@@ -320,9 +309,9 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             height: '36px',
             padding: '0 14px',
             borderRadius: '4px',
-            backgroundColor: isDark ? '#334155' : '#1e293b',
+            backgroundColor: '#1e293b',
             color: '#ffffff',
-            border: isDark ? '1px solid #475569' : 'none',
+            border: 'none',
             fontSize: '13px',
             fontWeight: 600,
             cursor: 'pointer',
@@ -331,8 +320,8 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
             alignItems: 'center',
             gap: '6px',
           }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#475569' : '#0f172a')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#1e293b')}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0f172a')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#1e293b')}
         >
           <AlertTriangle size={15} color="#fbbf24" />
           <span>Lưu ý</span>

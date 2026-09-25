@@ -102,15 +102,6 @@ interface AppStoreContextType {
   closeToast: () => void;
   showToast: (message: string, type?: 'success' | 'warning' | 'danger' | 'info', icon?: string) => void;
 
-  // Theme
-  theme: 'light' | 'dark';
-  setTheme: (theme: 'light' | 'dark') => void;
-  toggleTheme: () => void;
-  // Aliases for sidebar compatibility
-  sidebarTheme: 'light' | 'dark';
-  setSidebarTheme: (theme: 'light' | 'dark') => void;
-  toggleSidebarTheme: () => void;
-
   // Reset
   resetToDefault: () => void;
 }
@@ -122,8 +113,6 @@ const STORAGE_KEYS = {
   CURRENT_USER: 'egov_utt_current_user_v3',
   REPORTS: 'egov_utt_reports_v3',
   NOTIFICATIONS: 'egov_utt_notifications_v3',
-  THEME: 'egov_utt_app_theme_v1',
-  SIDEBAR_THEME: 'egov_utt_sidebar_theme_v1',
 };
 
 export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
@@ -132,7 +121,6 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [reports, setReports] = useState<WorkReport[]>(() => sortReportsByDay(INITIAL_REPORTS));
   const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
-  const [theme, setThemeState] = useState<'dark' | 'light'>('light');
 
   // Khởi tạo tuần và năm theo thời gian thực (real-time)
   const initialRealtime = getCurrentRealtimeWeek();
@@ -151,17 +139,16 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       setSelectedWeek(realtimeNow.weekNumber);
       setSelectedYear(realtimeNow.year);
 
-      // Load app theme preference (fallback to legacy sidebar key if present)
-      const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || localStorage.getItem(STORAGE_KEYS.SIDEBAR_THEME);
-      const activeTheme: 'light' | 'dark' = (savedTheme === 'dark' || savedTheme === 'light') ? savedTheme : 'light';
-      setThemeState(activeTheme);
-      if (typeof document !== 'undefined') {
-        document.documentElement.setAttribute('data-theme', activeTheme);
-        document.documentElement.style.colorScheme = activeTheme;
-      }
-
       // Clear legacy localStorage auto-login key if exists
       localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+
+      // Xóa các key giao diện sáng tối và gỡ data-theme
+      localStorage.removeItem('egov_utt_app_theme_v1');
+      localStorage.removeItem('egov_utt_sidebar_theme_v1');
+      if (typeof document !== 'undefined') {
+        document.documentElement.removeAttribute('data-theme');
+        document.documentElement.style.colorScheme = 'light';
+      }
 
       const savedUsers = localStorage.getItem(STORAGE_KEYS.USERS);
       if (savedUsers) {
@@ -676,24 +663,6 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     showToast('Đã khôi phục dữ liệu hệ thống mặc định!', 'info', '🔄');
   };
 
-  const setTheme = (newTheme: 'dark' | 'light') => {
-    setThemeState(newTheme);
-    try {
-      localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
-      localStorage.setItem(STORAGE_KEYS.SIDEBAR_THEME, newTheme);
-      if (typeof document !== 'undefined') {
-        document.documentElement.setAttribute('data-theme', newTheme);
-        document.documentElement.style.colorScheme = newTheme;
-      }
-    } catch {
-      // ignore
-    }
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -727,12 +696,6 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
         toast,
         closeToast,
         showToast,
-        theme,
-        setTheme,
-        toggleTheme,
-        sidebarTheme: theme,
-        setSidebarTheme: setTheme,
-        toggleSidebarTheme: toggleTheme,
         resetToDefault,
       }}
     >

@@ -158,7 +158,7 @@ export default function LoginPage() {
                 <Mail size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '11px' }} />
                 <input
                   type="email"
-                  placeholder="Nhập email của bạn"
+                  placeholder="VD: Nhập email của bạn"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -231,7 +231,7 @@ export default function LoginPage() {
 
           {/* Register trigger */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>Chưa có tài khoản? </span>
+            <span style={{ fontSize: '13px', color: '#64748b' }}>Chưa có tài khoản nhân viên? </span>
             <button
               type="button"
               onClick={() => setIsRegisterOpen(true)}
