@@ -163,7 +163,6 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                     verticalAlign: 'top',
                   }}
                 >
-                  {/* Cột Thứ: Nền xanh ngọc nổi bật matching Screenshot 2 */}
                   <td
                     style={{
                       backgroundColor: '#38bdf8',
