@@ -139,7 +139,7 @@ export default function Header({
           <span className="ticker-sep">✦</span>
           📊 Theo dõi &amp; quản lý tiến độ công việc toàn trường
           <span className="ticker-sep">✦</span>
-          ✨ Chúc quý Thầy Cô và Nhân viên một ngày làm việc hiệu quả!
+          ✨ Chúc Nhân viên một ngày làm việc hiệu quả!
           <span className="ticker-sep">✦</span>
         </span>
       </div>
