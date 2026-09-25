@@ -12,8 +12,12 @@ interface UnreportedStatsModalProps {
 export default function UnreportedStatsModal({ isOpen, onClose }: UnreportedStatsModalProps) {
   const { users, reports, showToast, notifyUnreportedStaff } = useAppStore();
 
-  const [fromDate, setFromDate] = useState('2026-09-10');
-  const [toDate, setToDate] = useState('2026-09-21');
+  const [fromDate, setFromDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  });
+  const [toDate, setToDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [hasQueried, setHasQueried] = useState(false);
   const [search, setSearch] = useState('');
 

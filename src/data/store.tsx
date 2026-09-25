@@ -146,28 +146,16 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       if (savedUsers) {
         try {
           const parsed: User[] = JSON.parse(savedUsers);
-          // Merge INITIAL_USERS to ensure any edits in initialData.ts are immediately active
-          const merged = [...INITIAL_USERS];
-          parsed.forEach((saved) => {
-            const index = merged.findIndex(
-              (m) => m.id === saved.id || m.username.toLowerCase() === saved.username.toLowerCase()
-            );
-            if (index >= 0) {
-              merged[index] = { ...saved, ...merged[index], password: merged[index].password || saved.password || 'password123' };
-            } else {
-              const normalizedEmail = saved.email.replace(/@utt\.edu\.vn$/i, '@gmail.com');
-              merged.push({ ...saved, email: normalizedEmail, password: saved.password || 'password123' });
-            }
-          });
-          setUsers(merged);
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(merged));
+          const legacyMockUserIds = ['user-admin', 'user-1', 'user-2', 'user-3', 'user-4'];
+          const cleanedUsers = parsed.filter((u) => !legacyMockUserIds.includes(u.id));
+          setUsers(cleanedUsers);
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(cleanedUsers));
         } catch {
-          setUsers(INITIAL_USERS);
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_USERS));
+          setUsers([]);
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
         }
       } else {
-        setUsers(INITIAL_USERS);
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_USERS));
+        setUsers([]);
       }
 
       const sessionUser = sessionStorage.getItem(STORAGE_KEYS.CURRENT_USER);
@@ -190,40 +178,32 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       if (savedReports) {
         try {
           const parsed: WorkReport[] = JSON.parse(savedReports);
-          // Migration: Nếu có báo cáo cũ ngày 2026-09-21 bị gán nhầm weekNumber 38 thì chuẩn hóa về weekNumber 39
-          const normalized = parsed.map((r) => {
-            if (r.date && r.weekNumber === 38 && r.date >= '2026-09-21' && r.date <= '2026-09-27') {
-              return { ...r, weekNumber: 39 };
-            }
-            return r;
-          });
-          setReports(sortReportsByDay(normalized));
+          const legacyMockReportIds = ['rep-1', 'rep-2', 'rep-3'];
+          const cleanedReports = parsed.filter((r) => !legacyMockReportIds.includes(r.id));
+          setReports(sortReportsByDay(cleanedReports));
+          localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(cleanedReports));
         } catch {
-          setReports(sortReportsByDay(INITIAL_REPORTS));
+          setReports([]);
+          localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify([]));
         }
       } else {
-        setReports(sortReportsByDay(INITIAL_REPORTS));
+        setReports([]);
       }
 
       const savedNotifs = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
       if (savedNotifs) {
         try {
           const parsed: AppNotification[] = JSON.parse(savedNotifs);
-          const merged = [...parsed];
-          INITIAL_NOTIFICATIONS.forEach((initN) => {
-            if (!merged.some((m) => m.id === initN.id)) {
-              merged.unshift(initN);
-            }
-          });
-          setNotifications(merged);
-          localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(merged));
+          const legacyMockNotifIds = ['notif-unreported-hung', 'notif-1', 'notif-2', 'notif-3'];
+          const cleanedNotifs = parsed.filter((n) => !legacyMockNotifIds.includes(n.id));
+          setNotifications(cleanedNotifs);
+          localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(cleanedNotifs));
         } catch {
-          setNotifications(INITIAL_NOTIFICATIONS);
-          localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
+          setNotifications([]);
+          localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]));
         }
       } else {
-        setNotifications(INITIAL_NOTIFICATIONS);
-        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(INITIAL_NOTIFICATIONS));
+        setNotifications([]);
       }
     } catch (e) {
       console.error('Error loading from storage:', e);
@@ -246,18 +226,18 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
 
         if (!isMounted) return;
 
-        if (remoteUsers && remoteUsers.length > 0) {
+        if (remoteUsers !== null) {
           setUsers(remoteUsers);
           localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(remoteUsers));
         }
 
-        if (remoteReports && remoteReports.length > 0) {
+        if (remoteReports !== null) {
           const sorted = sortReportsByDay(remoteReports);
           setReports(sorted);
           localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(sorted));
         }
 
-        if (remoteNotifs && remoteNotifs.length > 0) {
+        if (remoteNotifs !== null) {
           setNotifications(remoteNotifs);
           localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(remoteNotifs));
         }
@@ -333,7 +313,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Push notifications for unreported staff
-  const notifyUnreportedStaff = (targetDate: string = '2026-09-21') => {
+  const notifyUnreportedStaff = (targetDate: string = new Date().toISOString().split('T')[0]) => {
     const unreported = users.filter((u) => {
       if (u.role === 'admin') return false;
       const hasCompleted = reports.some(
