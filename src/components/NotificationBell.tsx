@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, CheckCheck, Trash2, PlusCircle, RefreshCw, XCircle, Info, AlertTriangle } from 'lucide-react';
+import { Bell, CheckCheck, Trash2, PlusCircle, RefreshCw, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import styles from './NotificationBell.module.css';
 
@@ -29,18 +29,20 @@ export default function NotificationBell() {
     }
   }, [bellTriggerKey]);
 
-  // Click outside listener
+  // Click & Touch outside listener
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [isOpen]);
 
@@ -101,35 +103,50 @@ export default function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className={styles.popover}>
-          <div className={styles.popoverHeader}>
-            <div className={styles.popoverTitle}>
-              <Bell size={16} color="#a11f24" />
-              <span>Thông báo hệ thống ({notifications.length})</span>
-            </div>
-            <div className={styles.popoverActions}>
-              {unreadCount > 0 && (
+        <>
+          <div
+            className={styles.backdrop}
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+          <div className={styles.popover}>
+            <div className={styles.popoverHeader}>
+              <div className={styles.popoverTitle}>
+                <Bell size={16} color="#a11f24" />
+                <span>Thông báo ({notifications.length})</span>
+              </div>
+              <div className={styles.popoverActions}>
+                {unreadCount > 0 && (
+                  <button
+                    type="button"
+                    className={styles.actionLink}
+                    onClick={markAllNotificationsRead}
+                    title="Đánh dấu tất cả đã đọc"
+                  >
+                    <CheckCheck size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Đã đọc
+                  </button>
+                )}
+                {notifications.length > 0 && (
+                  <button
+                    type="button"
+                    className={`${styles.actionLink} ${styles.actionLinkDanger}`}
+                    onClick={clearNotificationHistory}
+                    title="Xóa toàn bộ thông báo"
+                  >
+                    <Trash2 size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /> Xóa
+                  </button>
+                )}
                 <button
                   type="button"
-                  className={styles.actionLink}
-                  onClick={markAllNotificationsRead}
-                  title="Đánh dấu tất cả đã đọc"
+                  className={styles.closeBtn}
+                  onClick={() => setIsOpen(false)}
+                  title="Đóng thông báo"
+                  aria-label="Đóng"
                 >
-                  <CheckCheck size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Đã đọc
+                  <X size={16} />
                 </button>
-              )}
-              {notifications.length > 0 && (
-                <button
-                  type="button"
-                  className={`${styles.actionLink} ${styles.actionLinkDanger}`}
-                  onClick={clearNotificationHistory}
-                  title="Xóa toàn bộ thông báo"
-                >
-                  <Trash2 size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /> Xóa
-                </button>
-              )}
+              </div>
             </div>
-          </div>
 
           <ul className={styles.notifList}>
             {notifications.length === 0 ? (
@@ -151,6 +168,7 @@ export default function NotificationBell() {
             )}
           </ul>
         </div>
+        </>
       )}
     </div>
   );

@@ -100,26 +100,6 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <style>{`
-        .table-mobile-hint {
-          display: none;
-          align-items: center;
-          justify-content: space-between;
-          padding: 8px 12px;
-          background-color: #f8fafc;
-          border-bottom: 1px solid #e2e8f0;
-          font-size: 12px;
-          color: #64748b;
-          font-weight: 500;
-        }
-        @media (max-width: 900px) {
-          .table-mobile-hint { display: flex !important; }
-        }
-      `}</style>
-      <div className="table-mobile-hint">
-        <span>👉 Vuốt ngang bảng để xem đầy đủ các cột</span>
-        <span>↔️ Cuộn ngang</span>
-      </div>
       <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
         <table
           style={{
