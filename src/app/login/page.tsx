@@ -231,7 +231,7 @@ export default function LoginPage() {
 
           {/* Register trigger */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>Chưa có tài khoản nhân viên? </span>
+            <span style={{ fontSize: '13px', color: '#64748b' }}>Chưa có tài khoản? </span>
             <button
               type="button"
               onClick={() => setIsRegisterOpen(true)}
