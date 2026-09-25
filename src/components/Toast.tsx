@@ -57,7 +57,7 @@ export default function Toast() {
     <div
       style={{
         position: 'fixed',
-        bottom: '24px',
+        bottom: '86px',
         right: '24px',
         zIndex: 9999,
         maxWidth: '400px',
