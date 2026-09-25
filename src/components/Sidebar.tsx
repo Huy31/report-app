@@ -357,7 +357,7 @@ export default function Sidebar({
 
             {!collapsed && (
               <div style={{ textAlign: 'center', fontSize: '10.5px', color: '#64748b', marginTop: '4px' }}>
-                © 2026 EGOV • ĐH CÔNG NGHỆ GTVT
+                © 2026 • ĐH CÔNG NGHỆ GTVT
               </div>
             )}
           </div>
