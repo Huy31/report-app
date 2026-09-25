@@ -15,7 +15,8 @@ interface ReportTableProps {
 }
 
 export default function ReportTable({ onEditReport, onCommentReport }: ReportTableProps) {
-  const { reports, deleteReport, selectedWeek, selectedYear, selectedDay, showToast } = useAppStore();
+  const { reports, deleteReport, selectedWeek, selectedYear, selectedDay, showToast, theme } = useAppStore();
+  const isDark = theme === 'dark';
   const [selectedAttachmentReport, setSelectedAttachmentReport] = useState<WorkReport | null>(null);
 
   // Filter reports according to selected week, year, and day
@@ -82,7 +83,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
         {lines.map((line, idx) => (
-          <div key={idx} style={{ fontSize: '13px', lineHeight: '1.5', color: '#1e293b' }}>
+          <div key={idx} style={{ fontSize: '13px', lineHeight: '1.5', color: isDark ? '#f1f5f9' : '#1e293b' }}>
             {line}
           </div>
         ))}
@@ -90,14 +91,17 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
     );
   };
 
+  const cellBorder = isDark ? '1px solid #334155' : '1px solid #f1f5f9';
+
   return (
     <div
       style={{
-        backgroundColor: '#ffffff',
-        border: '1px solid #e2e8f0',
+        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
         borderRadius: '6px',
         overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        boxShadow: isDark ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
+        transition: 'background-color 0.2s, border-color 0.2s',
       }}
     >
       <div style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
@@ -149,8 +153,8 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
           <tbody>
             {sortedReports.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: '40px 20px', textAlign: 'center', color: '#64748b' }}>
-                  <FileText size={36} color="#cbd5e1" style={{ margin: '0 auto 8px', display: 'block' }} />
+                <td colSpan={8} style={{ padding: '40px 20px', textAlign: 'center', color: isDark ? '#94a3b8' : '#64748b' }}>
+                  <FileText size={36} color={isDark ? '#475569' : '#cbd5e1'} style={{ margin: '0 auto 8px', display: 'block' }} />
                   <p style={{ fontWeight: 600 }}>Không có báo cáo nào cho tuần/thứ đã chọn.</p>
                 </td>
               </tr>
@@ -159,7 +163,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                 <tr
                   key={report.id}
                   style={{
-                    borderBottom: '1px solid #e2e8f0',
+                    borderBottom: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
                     verticalAlign: 'top',
                   }}
                 >
@@ -183,7 +187,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                     style={{
                       padding: '12px',
                       fontWeight: 600,
-                      color: '#0f172a',
+                      color: isDark ? '#f8fafc' : '#0f172a',
                       fontSize: '13.5px',
                     }}
                   >
@@ -191,12 +195,12 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                   </td>
 
                   {/* Nội dung báo cáo */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '12px', borderLeft: cellBorder }}>
                     {renderFormattedLines(report.currentWork)}
                   </td>
 
                   {/* File đính kèm */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '12px', borderLeft: cellBorder }}>
                     {(() => {
                       const att = resolveReportAttachment(report);
                       if (!att || !att.name) return null;
@@ -215,10 +219,10 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                             color: meta.badgeColor,
                             fontSize: '12px',
                             fontWeight: 600,
-                            backgroundColor: meta.badgeBg,
+                            backgroundColor: isDark ? 'rgba(30, 41, 59, 0.9)' : meta.badgeBg,
                             padding: '5px 9px',
                             borderRadius: '5px',
-                            border: `1px solid ${meta.badgeBorder}`,
+                            border: `1px solid ${isDark ? '#475569' : meta.badgeBorder}`,
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
                             textAlign: 'left',
@@ -253,8 +257,8 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                                 fontWeight: 700,
                                 padding: '1px 3px',
                                 borderRadius: '3px',
-                                backgroundColor: '#ffffff',
-                                border: `1px solid ${meta.badgeBorder}`,
+                                backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                                border: `1px solid ${isDark ? '#475569' : meta.badgeBorder}`,
                                 lineHeight: 1,
                               }}
                             >
@@ -267,12 +271,12 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                   </td>
 
                   {/* Công việc ngày mai/tuần sau */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '12px', borderLeft: cellBorder }}>
                     {renderFormattedLines(report.nextWork)}
                   </td>
 
                   {/* Đề xuất */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9', color: '#475569', fontSize: '12.5px' }}>
+                  <td style={{ padding: '12px', borderLeft: cellBorder, color: isDark ? '#94a3b8' : '#475569', fontSize: '12.5px' }}>
                     {report.proposal || ''}
                   </td>
 
@@ -280,7 +284,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                   <td
                     style={{
                       padding: '12px 8px',
-                      borderLeft: '1px solid #f1f5f9',
+                      borderLeft: cellBorder,
                       textAlign: 'center',
                     }}
                   >
@@ -289,9 +293,9 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                         style={{
                           padding: '3px 8px',
                           borderRadius: '4px',
-                          border: '1px solid #fde047',
-                          backgroundColor: '#fefce8',
-                          color: '#854d0e',
+                          border: isDark ? '1px solid #713f12' : '1px solid #fde047',
+                          backgroundColor: isDark ? '#422006' : '#fefce8',
+                          color: isDark ? '#fef08a' : '#854d0e',
                           fontSize: '11px',
                           fontWeight: 600,
                           whiteSpace: 'nowrap',
@@ -305,9 +309,9 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                         style={{
                           padding: '3px 8px',
                           borderRadius: '4px',
-                          border: '1px solid #fca5a5',
-                          backgroundColor: '#fef2f2',
-                          color: '#b91c1c',
+                          border: isDark ? '1px solid #7f1d1d' : '1px solid #fca5a5',
+                          backgroundColor: isDark ? '#450a0a' : '#fef2f2',
+                          color: isDark ? '#fecaca' : '#b91c1c',
                           fontSize: '11px',
                           fontWeight: 600,
                           whiteSpace: 'nowrap',
@@ -322,7 +326,7 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                   <td
                     style={{
                       padding: '12px 6px',
-                      borderLeft: '1px solid #f1f5f9',
+                      borderLeft: cellBorder,
                       textAlign: 'center',
                     }}
                   >

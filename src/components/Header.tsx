@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Menu, User, KeyRound, LogOut, ChevronDown, UserCircle } from 'lucide-react';
+import { Menu, User, KeyRound, LogOut, ChevronDown, UserCircle, Sun, Moon } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import UttLogo from './UttLogo';
 import RealtimeClock from './RealtimeClock';
@@ -21,7 +21,8 @@ export default function Header({
   onOpenChangePassword,
 }: HeaderProps) {
   const router = useRouter();
-  const { currentUser, logout } = useAppStore();
+  const { currentUser, logout, theme, toggleTheme } = useAppStore();
+  const isDark = theme === 'dark';
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -40,8 +41,8 @@ export default function Header({
   return (
     <header
       style={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e2e8f0',
+        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        borderBottom: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
         padding: '10px 20px',
         display: 'flex',
         alignItems: 'center',
@@ -49,8 +50,9 @@ export default function Header({
         position: 'sticky',
         top: 0,
         zIndex: 900,
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        boxShadow: isDark ? '0 1px 4px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)',
         gap: '16px',
+        transition: 'background-color 0.2s ease, border-color 0.2s ease',
       }}
     >
       <style>{`
@@ -61,8 +63,8 @@ export default function Header({
         .header-ticker {
           display: flex;
           align-items: center;
-          background: linear-gradient(90deg, #f0f4ff 0%, #e8eeff 100%);
-          border: 1px solid #c7d2fe;
+          background: ${isDark ? 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' : 'linear-gradient(90deg, #f0f4ff 0%, #e8eeff 100%)'};
+          border: 1px solid ${isDark ? '#334155' : '#c7d2fe'};
           border-radius: 9999px;
           overflow: hidden;
           white-space: nowrap;
@@ -71,7 +73,7 @@ export default function Header({
           height: 34px;
           position: relative;
           margin: 0 16px;
-          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+          box-shadow: inset 0 1px 2px rgba(0, 0, 0, ${isDark ? '0.2' : '0.04'});
           mask-image: linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%);
           -webkit-mask-image: linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%);
         }
@@ -84,12 +86,12 @@ export default function Header({
           white-space: nowrap;
           font-size: 13px;
           font-weight: 600;
-          color: #2b2d6e;
+          color: ${isDark ? '#cbd5e1' : '#2b2d6e'};
           padding-left: 20px;
         }
         .header-ticker-inner .ticker-sep {
           margin: 0 20px;
-          color: #a11f24;
+          color: ${isDark ? '#f87171' : '#a11f24'};
           font-weight: 900;
         }
         @media (max-width: 1100px) {
@@ -106,9 +108,9 @@ export default function Header({
           width: 38px;
           height: 38px;
           border-radius: 8px;
-          background-color: #f1f5f9;
-          color: #1e293b;
-          border: 1px solid #cbd5e1;
+          background-color: ${isDark ? '#0f172a' : '#f1f5f9'};
+          color: ${isDark ? '#f8fafc' : '#1e293b'};
+          border: 1px solid ${isDark ? '#334155' : '#cbd5e1'};
         }
         @media (max-width: 991px) {
           .hamburger-btn { display: flex !important; }
@@ -127,7 +129,7 @@ export default function Header({
           <Menu size={22} />
         </button>
 
-        <UttLogo size="sm" />
+        <UttLogo size="sm" variant={isDark ? 'dark' : 'light'} />
       </div>
 
       {/* Center section: Animated Marquee Ticker */}
@@ -143,12 +145,44 @@ export default function Header({
           <span className="ticker-sep">✦</span>
         </span>
       </div>
-
-      {/* Right section: Clock, Notification Bell, User profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+      {/* Right section: Clock, Theme Switcher, Notification Bell, User profile */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
         <div className="clock-container">
           <RealtimeClock />
         </div>
+
+        {/* Theme Switcher Button */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={isDark ? 'Chuyển sang giao diện Sáng (Light)' : 'Chuyển sang giao diện Tối (Dark)'}
+          style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: isDark ? '#0f172a' : '#ffffff',
+            border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+            color: isDark ? '#fbbf24' : '#ea580c',
+            cursor: 'pointer',
+            boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)',
+            transition: 'all 0.2s ease',
+            flexShrink: 0,
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#f8fafc';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = isDark ? '#0f172a' : '#ffffff';
+            e.currentTarget.style.transform = 'none';
+          }}
+          aria-label="Chuyển đổi giao diện Sáng / Tối"
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
 
         {/* Animated Bell Component */}
         <NotificationBell />
@@ -165,9 +199,10 @@ export default function Header({
                 gap: '8px',
                 padding: '4px 8px',
                 borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                backgroundColor: '#ffffff',
+                border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+                backgroundColor: isDark ? '#0f172a' : '#ffffff',
                 cursor: 'pointer',
+                transition: 'background-color 0.2s, border-color 0.2s',
               }}
             >
               <div
@@ -197,14 +232,14 @@ export default function Header({
                 )}
               </div>
               <div className="header-user-info" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f8fafc' : '#1e293b' }}>
                   {currentUser.fullName}
                 </span>
-                <span style={{ fontSize: '11px', color: '#64748b' }}>
+                <span style={{ fontSize: '11px', color: isDark ? '#94a3b8' : '#64748b' }}>
                   {currentUser.email}
                 </span>
               </div>
-              <ChevronDown size={14} color="#64748b" />
+              <ChevronDown size={14} color={isDark ? '#94a3b8' : '#64748b'} />
             </button>
 
             {/* Dropdown menu */}
@@ -215,10 +250,10 @@ export default function Header({
                   top: 'calc(100% + 8px)',
                   right: 0,
                   width: '240px',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: isDark ? '#1e293b' : '#ffffff',
                   borderRadius: '10px',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                  border: isDark ? '1px solid #334155' : '1px solid #e2e8f0',
+                  boxShadow: isDark ? '0 10px 25px -5px rgba(0, 0, 0, 0.5)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                   zIndex: 1000,
                   overflow: 'hidden',
                   animation: 'popoverFade 0.2s ease',
@@ -227,8 +262,8 @@ export default function Header({
                 <div
                   style={{
                     padding: '12px 16px',
-                    borderBottom: '1px solid #f1f5f9',
-                    backgroundColor: '#f8fafc',
+                    borderBottom: isDark ? '1px solid #334155' : '1px solid #f1f5f9',
+                    backgroundColor: isDark ? '#0f172a' : '#f8fafc',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
@@ -265,7 +300,7 @@ export default function Header({
                       style={{
                         fontSize: '13px',
                         fontWeight: 700,
-                        color: '#0f172a',
+                        color: isDark ? '#f8fafc' : '#0f172a',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -279,7 +314,7 @@ export default function Header({
                     <div
                       style={{
                         fontSize: '11.5px',
-                        color: '#64748b',
+                        color: isDark ? '#94a3b8' : '#64748b',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -306,10 +341,11 @@ export default function Header({
                       padding: '8px 12px',
                       borderRadius: '6px',
                       fontSize: '13px',
-                      color: '#334155',
+                      color: isDark ? '#f8fafc' : '#334155',
                       textAlign: 'left',
+                      backgroundColor: 'transparent',
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#f1f5f9')}
                     onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
                     <UserCircle size={16} color="#0284c7" />
@@ -330,17 +366,18 @@ export default function Header({
                       padding: '8px 12px',
                       borderRadius: '6px',
                       fontSize: '13px',
-                      color: '#334155',
+                      color: isDark ? '#f8fafc' : '#334155',
                       textAlign: 'left',
+                      backgroundColor: 'transparent',
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#f1f5f9')}
                     onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
                     <KeyRound size={16} color="#ea580c" />
                     <span>Đổi mật khẩu</span>
                   </button>
 
-                  <div style={{ height: '1px', backgroundColor: '#f1f5f9', margin: '4px 0' }} />
+                  <div style={{ height: '1px', backgroundColor: isDark ? '#334155' : '#f1f5f9', margin: '4px 0' }} />
 
                   <button
                     type="button"
@@ -357,13 +394,14 @@ export default function Header({
                       padding: '8px 12px',
                       borderRadius: '6px',
                       fontSize: '13px',
-                      color: '#dc2626',
+                      color: '#f87171',
                       textAlign: 'left',
+                      backgroundColor: 'transparent',
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fef2f2')}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#451a1a' : '#fef2f2')}
                     onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
-                    <LogOut size={16} color="#dc2626" />
+                    <LogOut size={16} color="#f87171" />
                     <span>Đăng xuất</span>
                   </button>
                 </div>
