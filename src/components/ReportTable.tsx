@@ -165,255 +165,255 @@ export default function ReportTable({ onEditReport, onCommentReport }: ReportTab
                 const canModify = Boolean(isOwner || currentUser?.role === 'admin');
 
                 return (
-                <tr
-                  key={report.id}
-                  style={{
-                    borderBottom: '1px solid #e2e8f0',
-                    verticalAlign: 'top',
-                  }}
-                >
-                  <td
+                  <tr
+                    key={report.id}
                     style={{
-                      backgroundColor: '#38bdf8',
-                      color: '#ffffff',
-                      fontWeight: 700,
-                      textAlign: 'center',
-                      padding: '12px 6px',
-                      fontSize: '12.5px',
-                      lineHeight: '1.3',
+                      borderBottom: '1px solid #e2e8f0',
+                      verticalAlign: 'top',
                     }}
                   >
-                    {formatDayOfWeek(report.dayOfWeek)}
-                  </td>
+                    <td
+                      style={{
+                        backgroundColor: '#38bdf8',
+                        color: '#ffffff',
+                        fontWeight: 700,
+                        textAlign: 'center',
+                        padding: '12px 6px',
+                        fontSize: '12.5px',
+                        lineHeight: '1.3',
+                      }}
+                    >
+                      {formatDayOfWeek(report.dayOfWeek)}
+                    </td>
 
-                  {/* Họ và tên */}
-                  <td
-                    style={{
-                      padding: '12px',
-                      fontWeight: 600,
-                      color: '#0f172a',
-                      fontSize: '13.5px',
-                    }}
-                  >
-                    {report.authorName}
-                  </td>
+                    {/* Họ và tên */}
+                    <td
+                      style={{
+                        padding: '12px',
+                        fontWeight: 600,
+                        color: '#0f172a',
+                        fontSize: '13.5px',
+                      }}
+                    >
+                      {report.authorName}
+                    </td>
 
-                  {/* Nội dung báo cáo */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
-                    {renderFormattedLines(report.currentWork)}
-                  </td>
+                    {/* Nội dung báo cáo */}
+                    <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
+                      {renderFormattedLines(report.currentWork)}
+                    </td>
 
-                  {/* File đính kèm */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
-                    {(() => {
-                      const att = resolveReportAttachment(report);
-                      if (!att || !att.name) return null;
-                      const meta = getFileMetaDisplay(att.name, att.type);
-                      const ext = getFileExtension(att.name);
+                    {/* File đính kèm */}
+                    <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
+                      {(() => {
+                        const att = resolveReportAttachment(report);
+                        if (!att || !att.name) return null;
+                        const meta = getFileMetaDisplay(att.name, att.type);
+                        const ext = getFileExtension(att.name);
 
-                      return (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedAttachmentReport(report)}
-                          title={`Xem thông tin chi tiết: ${att.name} (${formatFileSize(att.size)})\nNhấn để xem thông tin và tải file`}
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: meta.badgeColor,
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            backgroundColor: meta.badgeBg,
-                            padding: '5px 9px',
-                            borderRadius: '5px',
-                            border: `1px solid ${meta.badgeBorder}`,
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                            textAlign: 'left',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-1px)';
-                            e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.08)';
-                            e.currentTarget.style.filter = 'brightness(0.96)';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'none';
-                            e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)';
-                            e.currentTarget.style.filter = 'none';
-                          }}
-                        >
-                          <File size={13} color={meta.iconColor} />
-                          <span
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedAttachmentReport(report)}
+                            title={`Xem thông tin chi tiết: ${att.name} (${formatFileSize(att.size)})\nNhấn để xem thông tin và tải file`}
                             style={{
-                              maxWidth: '85px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: meta.badgeColor,
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              backgroundColor: meta.badgeBg,
+                              padding: '5px 9px',
+                              borderRadius: '5px',
+                              border: `1px solid ${meta.badgeBorder}`,
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                              textAlign: 'left',
+                              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                              e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.08)';
+                              e.currentTarget.style.filter = 'brightness(0.96)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'none';
+                              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)';
+                              e.currentTarget.style.filter = 'none';
                             }}
                           >
-                            {att.name}
-                          </span>
-                          {ext && (
+                            <File size={13} color={meta.iconColor} />
                             <span
                               style={{
-                                fontSize: '9.5px',
-                                fontWeight: 700,
-                                padding: '1px 3px',
-                                borderRadius: '3px',
-                                backgroundColor: '#ffffff',
-                                border: `1px solid ${meta.badgeBorder}`,
-                                lineHeight: 1,
+                                maxWidth: '85px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
                               }}
                             >
-                              {ext}
+                              {att.name}
                             </span>
-                          )}
-                        </button>
-                      );
-                    })()}
-                  </td>
+                            {ext && (
+                              <span
+                                style={{
+                                  fontSize: '9.5px',
+                                  fontWeight: 700,
+                                  padding: '1px 3px',
+                                  borderRadius: '3px',
+                                  backgroundColor: '#ffffff',
+                                  border: `1px solid ${meta.badgeBorder}`,
+                                  lineHeight: 1,
+                                }}
+                              >
+                                {ext}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })()}
+                    </td>
 
-                  {/* Công việc ngày mai/tuần sau */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
-                    {renderFormattedLines(report.nextWork)}
-                  </td>
+                    {/* Công việc ngày mai/tuần sau */}
+                    <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9' }}>
+                      {renderFormattedLines(report.nextWork)}
+                    </td>
 
-                  {/* Đề xuất */}
-                  <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9', color: '#475569', fontSize: '12.5px' }}>
-                    {report.proposal || ''}
-                  </td>
+                    {/* Đề xuất */}
+                    <td style={{ padding: '12px', borderLeft: '1px solid #f1f5f9', color: '#475569', fontSize: '12.5px' }}>
+                      {report.proposal || ''}
+                    </td>
 
-                  {/* Ngày tạo: 2 ô nhãn màu xanh và đỏ matching Screenshot 2 */}
-                  <td
-                    style={{
-                      padding: '12px 8px',
-                      borderLeft: '1px solid #f1f5f9',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
-                      <div
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: '4px',
-                          border: '1px solid #fde047',
-                          backgroundColor: '#fefce8',
-                          color: '#854d0e',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {formatDateTime(report.createdAt)}
+                    {/* Ngày tạo: 2 ô nhãn màu xanh và đỏ matching Screenshot 2 */}
+                    <td
+                      style={{
+                        padding: '12px 8px',
+                        borderLeft: '1px solid #f1f5f9',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                        <div
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid #fde047',
+                            backgroundColor: '#fefce8',
+                            color: '#854d0e',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {formatDateTime(report.createdAt)}
+                        </div>
+
+                        {/* Box 2 (Pink/red border box) */}
+                        <div
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid #fca5a5',
+                            backgroundColor: '#fef2f2',
+                            color: '#b91c1c',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {formatDateTime(report.updatedAt || report.createdAt)}
+                        </div>
                       </div>
+                    </td>
 
-                      {/* Box 2 (Pink/red border box) */}
-                      <div
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: '4px',
-                          border: '1px solid #fca5a5',
-                          backgroundColor: '#fef2f2',
-                          color: '#b91c1c',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {formatDateTime(report.updatedAt || report.createdAt)}
-                      </div>
-                    </div>
-                  </td>
+                    {/* Thao tác: Edit (vàng), Comment (cam), Delete (xám) */}
+                    <td
+                      style={{
+                        padding: '12px 6px',
+                        borderLeft: '1px solid #f1f5f9',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        {/* Edit: Chỉ hiển thị nếu là báo cáo cá nhân hoặc quản trị viên */}
+                        {canModify && (
+                          <button
+                            type="button"
+                            onClick={() => onEditReport(report)}
+                            title="Chỉnh sửa báo cáo"
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#eab308',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Pencil size={15} />
+                          </button>
+                        )}
 
-                  {/* Thao tác: Edit (vàng), Comment (cam), Delete (xám) */}
-                  <td
-                    style={{
-                      padding: '12px 6px',
-                      borderLeft: '1px solid #f1f5f9',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                      {/* Edit: Chỉ hiển thị nếu là báo cáo cá nhân hoặc quản trị viên */}
-                      {canModify && (
+                        {/* Comment: Mọi người đều có thể trao đổi/bình luận */}
                         <button
                           type="button"
-                          onClick={() => onEditReport(report)}
-                          title="Chỉnh sửa báo cáo"
+                          onClick={() => {
+                            if (onCommentReport) {
+                              onCommentReport(report);
+                            } else {
+                              handleComment(report.authorName);
+                            }
+                          }}
+                          title={`Bình luận báo cáo của ${report.authorName} (${report.comments?.length || 0})`}
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: '#eab308',
+                            color: '#f97316',
                             cursor: 'pointer',
                             padding: '2px',
                             display: 'flex',
                             alignItems: 'center',
+                            position: 'relative',
                           }}
                         >
-                          <Pencil size={15} />
+                          <MessageSquare size={15} />
+                          {(report.comments?.length || 0) > 0 && (
+                            <span
+                              style={{
+                                position: 'absolute',
+                                top: '-4px',
+                                right: '-6px',
+                                backgroundColor: '#ea580c',
+                                color: '#fff',
+                                borderRadius: '9999px',
+                                fontSize: '9px',
+                                fontWeight: 700,
+                                minWidth: '13px',
+                                height: '13px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '0 2px',
+                              }}
+                            >
+                              {report.comments?.length}
+                            </span>
+                          )}
                         </button>
-                      )}
 
-                      {/* Comment: Mọi người đều có thể trao đổi/bình luận */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onCommentReport) {
-                            onCommentReport(report);
-                          } else {
-                            handleComment(report.authorName);
-                          }
-                        }}
-                        title={`Bình luận báo cáo của ${report.authorName} (${report.comments?.length || 0})`}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#f97316',
-                          cursor: 'pointer',
-                          padding: '2px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          position: 'relative',
-                        }}
-                      >
-                        <MessageSquare size={15} />
-                        {(report.comments?.length || 0) > 0 && (
-                          <span
-                            style={{
-                              position: 'absolute',
-                              top: '-4px',
-                              right: '-6px',
-                              backgroundColor: '#ea580c',
-                              color: '#fff',
-                              borderRadius: '9999px',
-                              fontSize: '9px',
-                              fontWeight: 700,
-                              minWidth: '13px',
-                              height: '13px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: '0 2px',
-                            }}
-                          >
-                            {report.comments?.length}
-                          </span>
+                        {/* Animated Delete Button: Chỉ hiển thị nếu là báo cáo cá nhân hoặc quản trị viên */}
+                        {canModify && (
+                          <AnimatedDeleteButton
+                            size="sm"
+                            label="Delete"
+                            itemName={`báo cáo của ${report.authorName}`}
+                            onDelete={() => deleteReport(report.id)}
+                          />
                         )}
-                      </button>
-
-                      {/* Animated Delete Button: Chỉ hiển thị nếu là báo cáo cá nhân hoặc quản trị viên */}
-                      {canModify && (
-                        <AnimatedDeleteButton
-                          size="sm"
-                          label="Delete"
-                          itemName={`báo cáo của ${report.authorName}`}
-                          onDelete={() => deleteReport(report.id)}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                      </div>
+                    </td>
+                  </tr>
                 );
               })
             )}
