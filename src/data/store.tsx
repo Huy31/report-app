@@ -9,6 +9,7 @@ import {
   INITIAL_USERS,
   INITIAL_REPORTS,
   INITIAL_NOTIFICATIONS,
+  MOCK_STAFF_USER,
 } from './initialData';
 import {
   fetchUsersFromSupabase,
@@ -151,20 +152,25 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const savedUsers = localStorage.getItem(STORAGE_KEYS.USERS);
+      let loadedUsers: User[] = [];
       if (savedUsers) {
         try {
           const parsed: User[] = JSON.parse(savedUsers);
           const legacyMockUserIds = ['user-admin', 'user-1', 'user-2', 'user-3', 'user-4'];
-          const cleanedUsers = parsed.filter((u) => !legacyMockUserIds.includes(u.id));
-          setUsers(cleanedUsers);
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(cleanedUsers));
+          loadedUsers = parsed.filter((u) => !legacyMockUserIds.includes(u.id));
         } catch {
-          setUsers([]);
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
+          loadedUsers = [];
         }
-      } else {
-        setUsers([]);
       }
+      const hasStaff = loadedUsers.some(
+        (u) =>
+          u.username.toLowerCase() === MOCK_STAFF_USER.username.toLowerCase() ||
+          u.email.toLowerCase() === MOCK_STAFF_USER.email.toLowerCase() ||
+          u.id === MOCK_STAFF_USER.id
+      );
+      const finalUsers = hasStaff ? loadedUsers : [MOCK_STAFF_USER, ...loadedUsers];
+      setUsers(finalUsers);
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(finalUsers));
 
       const sessionUser = sessionStorage.getItem(STORAGE_KEYS.CURRENT_USER);
       if (sessionUser) {
@@ -235,8 +241,15 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
         if (!isMounted) return;
 
         if (remoteUsers !== null) {
-          setUsers(remoteUsers);
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(remoteUsers));
+          const hasStaff = remoteUsers.some(
+            (u) =>
+              u.username.toLowerCase() === MOCK_STAFF_USER.username.toLowerCase() ||
+              u.email.toLowerCase() === MOCK_STAFF_USER.email.toLowerCase() ||
+              u.id === MOCK_STAFF_USER.id
+          );
+          const finalUsers = hasStaff ? remoteUsers : [MOCK_STAFF_USER, ...remoteUsers];
+          setUsers(finalUsers);
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(finalUsers));
         }
 
         if (remoteReports !== null) {

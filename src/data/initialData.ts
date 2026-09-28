@@ -69,7 +69,26 @@ export interface AppNotification {
   read: boolean;
 }
 
-export const INITIAL_USERS: User[] = [];
+export const MOCK_STAFF_USER: User = {
+  id: 'user-mock-staff',
+  username: 'NV001',
+  password: 'password123',
+  fullName: 'Nguyễn Cảnh Hoàn',
+  email: 'hoannc@gmail.com',
+  phone: '0987654321',
+  department: 'Khoa Công nghệ Thông tin',
+  role: 'staff',
+  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+  lastName: 'Nguyễn Cảnh',
+  firstName: 'Hoàn',
+  birthDate: '1995-05-15',
+  gender: 'Nam',
+  workPhone: '024.38544264',
+  mobilePhone: '0987654321',
+  homeAddress: '54 Triều Khúc, Thanh Xuân, Hà Nội',
+};
+
+export const INITIAL_USERS: User[] = [MOCK_STAFF_USER];
 
 export const INITIAL_REPORTS: WorkReport[] = [];
 
