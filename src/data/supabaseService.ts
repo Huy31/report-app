@@ -144,7 +144,13 @@ export async function fetchReportsFromSupabase(): Promise<WorkReport[] | null> {
   }
 }
 
-export async function insertReportToSupabase(report: WorkReport): Promise<boolean> {
+export interface InsertReportResult {
+  ok: boolean;
+  /** true nếu Supabase từ chối do trigger hạn chót (REPORT_DEADLINE_PASSED) */
+  deadlinePassed?: boolean;
+}
+
+export async function insertReportToSupabase(report: WorkReport): Promise<InsertReportResult> {
   try {
     const { error } = await supabase.from('work_reports').insert({
       id: report.id,
@@ -164,7 +170,12 @@ export async function insertReportToSupabase(report: WorkReport): Promise<boolea
       created_at: report.createdAt || new Date().toISOString(),
     });
 
-    if (!error && report.attachment) {
+    if (error) {
+      const deadlinePassed = `${error.message || ''} ${error.details || ''}`.includes('REPORT_DEADLINE_PASSED');
+      return { ok: false, deadlinePassed };
+    }
+
+    if (report.attachment) {
       await supabase.from('report_attachments').insert({
         report_id: report.id,
         file_name: report.attachment.name,
@@ -175,9 +186,9 @@ export async function insertReportToSupabase(report: WorkReport): Promise<boolea
       });
     }
 
-    return !error;
+    return { ok: true };
   } catch {
-    return false;
+    return { ok: false };
   }
 }
 

@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Save, UploadCloud, File, Trash2, Eye, Paperclip, X } from 'lucide-react';
 import { useAppStore } from '@/data/store';
 import { WorkReport, ReportAttachment } from '@/data/initialData';
-import { getWeeksInYear, AVAILABLE_YEARS, getDayOfWeekOrder, formatDayOfWeek, getDateOfDayInWeek, DAYS_OF_WEEK_LIST, getCurrentRealtimeWeek } from '@/utils/dateUtils';
+import { getWeeksInYear, AVAILABLE_YEARS, getDayOfWeekOrder, formatDayOfWeek, getDateOfDayInWeek, DAYS_OF_WEEK_LIST, getCurrentRealtimeWeek, isPastReportDeadline, REPORT_DEADLINE_LABEL } from '@/utils/dateUtils';
+import { useReportDeadline } from '@/utils/useReportDeadline';
 import { formatFileSize, getFileMetaDisplay, resolveReportAttachment } from '@/utils/fileHelpers';
 import RichTextEditor from '../RichTextEditor';
 import AttachmentDetailModal from './AttachmentDetailModal';
@@ -36,6 +37,12 @@ export default function CreateReportModal({
   const [attachment, setAttachment] = useState<ReportAttachment | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Hạn chót chỉ áp dụng cho tạo mới, không áp dụng cho chỉnh sửa
+  const { isLocked } = useReportDeadline();
+  const isCreateLocked = !reportToEdit && isLocked;
+  const deadlineMessage = `Đã quá ${REPORT_DEADLINE_LABEL}, không thể tạo báo cáo mới hôm nay!`;
 
   useEffect(() => {
     if (reportToEdit) {
@@ -100,9 +107,14 @@ export default function CreateReportModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!reportToEdit && isPastReportDeadline()) {
+      setError(deadlineMessage);
+      return;
+    }
 
     if (!currentWork.trim()) {
       setError('Vui lòng nhập nội dung báo cáo!');
@@ -129,7 +141,8 @@ export default function CreateReportModal({
         attachment: attachment || undefined,
       });
     } else {
-      addReport({
+      setIsSubmitting(true);
+      const created = await addReport({
         dayOfWeek,
         date: reportDate,
         weekNumber,
@@ -141,6 +154,11 @@ export default function CreateReportModal({
         attachment: attachment || undefined,
         status: 'completed',
       });
+      setIsSubmitting(false);
+      if (!created) {
+        setError(deadlineMessage);
+        return;
+      }
     }
 
     onClose();
@@ -219,7 +237,25 @@ export default function CreateReportModal({
             backgroundColor: '#ffffff',
           }}
         >
-          {error && (
+          {isCreateLocked && (
+            <div
+              id="report-deadline-banner"
+              style={{
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fca5a5',
+                borderLeft: '4px solid #dc2626',
+                borderRadius: '4px',
+                padding: '10px 14px',
+                fontSize: '13px',
+                color: '#b91c1c',
+                fontWeight: 700,
+              }}
+            >
+              ⏰ {deadlineMessage} Bạn vẫn có thể chỉnh sửa các báo cáo đã nộp.
+            </div>
+          )}
+
+          {error && error !== (isCreateLocked ? deadlineMessage : '') && (
             <div
               style={{
                 backgroundColor: '#fef2f2',
@@ -559,6 +595,9 @@ export default function CreateReportModal({
             <div style={{ fontWeight: 700, color: '#111827' }}>
               Lưu ý: Mỗi ngày cần viết báo cáo vì dữ liệu hiển thị theo ngày tạo báo cáo. Hôm nay không thể tạo báo cáo bù cho hôm qua.
             </div>
+            <div style={{ fontWeight: 700, color: '#b45309' }}>
+              Hạn chót tạo báo cáo là {REPORT_DEADLINE_LABEL} từ Thứ Hai đến Thứ Sáu.
+            </div>
           </div>
 
           {/* Row 7: Action Buttons (Lưu báo cáo - green & Đóng - red) */}
@@ -572,9 +611,11 @@ export default function CreateReportModal({
             }}
           >
             <button
+              id="save-report-btn"
               type="submit"
+              disabled={isCreateLocked || isSubmitting}
               style={{
-                backgroundColor: '#15803d',
+                backgroundColor: isCreateLocked ? '#9ca3af' : '#15803d',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '4px',
@@ -584,14 +625,19 @@ export default function CreateReportModal({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '7px',
-                cursor: 'pointer',
+                cursor: isCreateLocked || isSubmitting ? 'not-allowed' : 'pointer',
+                opacity: isSubmitting ? 0.7 : 1,
                 transition: 'background-color 0.15s',
               }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#166534')}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#15803d')}
+              onMouseOver={(e) => {
+                if (!isCreateLocked) e.currentTarget.style.backgroundColor = '#166534';
+              }}
+              onMouseOut={(e) => {
+                if (!isCreateLocked) e.currentTarget.style.backgroundColor = '#15803d';
+              }}
             >
               <Save size={16} color="#ffffff" strokeWidth={2.2} />
-              <span>Lưu báo cáo</span>
+              <span>{isSubmitting ? 'Đang lưu...' : 'Lưu báo cáo'}</span>
             </button>
 
             <button

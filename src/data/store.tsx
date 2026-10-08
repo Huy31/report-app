@@ -25,7 +25,7 @@ import {
   markAllNotificationsReadInSupabase,
   clearNotificationsInSupabase,
 } from './supabaseService';
-import { getDayOfWeekOrder, getCurrentRealtimeWeek } from '@/utils/dateUtils';
+import { getDayOfWeekOrder, getCurrentRealtimeWeek, isPastReportDeadline, REPORT_DEADLINE_LABEL } from '@/utils/dateUtils';
 
 export interface ToastData {
   id: number;
@@ -77,7 +77,8 @@ interface AppStoreContextType {
 
   // Reports
   reports: WorkReport[];
-  addReport: (report: Omit<WorkReport, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorCode' | 'department'>) => void;
+  /** Trả về true nếu tạo thành công, false nếu bị chặn (ví dụ quá hạn 18:30). */
+  addReport: (report: Omit<WorkReport, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorCode' | 'department'>) => Promise<boolean>;
   updateReport: (id: string, updatedData: Partial<WorkReport>) => void;
   deleteReport: (id: string) => void;
   addComment: (reportId: string, content: string) => void;
@@ -526,8 +527,15 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Report actions
-  const addReport = (reportData: Omit<WorkReport, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorCode' | 'department'>) => {
-    if (!currentUser) return;
+  const addReport = async (reportData: Omit<WorkReport, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorCode' | 'department'>): Promise<boolean> => {
+    if (!currentUser) return false;
+
+    // Chặn tạo báo cáo mới sau hạn chót (18:30, Thứ Hai - Thứ Sáu)
+    const deadlineMessage = `Đã quá ${REPORT_DEADLINE_LABEL}, không thể tạo báo cáo mới hôm nay!`;
+    if (isPastReportDeadline()) {
+      showToast(deadlineMessage, 'danger', '⏰');
+      return false;
+    }
 
     // Sinh ID báo cáo tuần tự ngắn gọn: rep-1, rep-2, rep-3, rep-4...
     const repNumbers = reports
@@ -549,9 +557,18 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
     };
 
+    // Gửi lên Supabase trước để trigger phía server có thể từ chối nếu quá hạn
+    const result = await insertReportToSupabase(newReport).catch((err) => {
+      console.error(err);
+      return { ok: false, deadlinePassed: false };
+    });
+    if (result.deadlinePassed) {
+      showToast(deadlineMessage, 'danger', '⏰');
+      return false;
+    }
+
     const updated = [newReport, ...reports];
     saveReports(updated);
-    insertReportToSupabase(newReport).catch(console.error);
 
     // Kích hoạt Bell Animation, Ripple và Notification, Toast
     addNotification(
@@ -560,6 +577,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
       `${currentUser.fullName} vừa nộp báo cáo ${newReport.dayOfWeek} (Tuần ${newReport.weekNumber}/${newReport.year}).`
     );
     showToast('🔔 Báo cáo công việc vừa được tạo thành công!', 'success', '✅');
+    return true;
   };
 
   const updateReport = (id: string, updatedData: Partial<WorkReport>) => {
