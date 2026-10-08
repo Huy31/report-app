@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { PlusCircle, AlertTriangle } from 'lucide-react';
+import { PlusCircle, AlertTriangle, Lock } from 'lucide-react';
 import { useAppStore } from '@/data/store';
-import { getWeeksInYear, AVAILABLE_YEARS } from '@/utils/dateUtils';
+import { getWeeksInYear, AVAILABLE_YEARS, REPORT_DEADLINE_LABEL } from '@/utils/dateUtils';
+import { useReportDeadline } from '@/utils/useReportDeadline';
 
 interface FilterBarProps {
   onCreateNewReport: () => void;
@@ -20,6 +21,10 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
     setSelectedDay,
     showToast,
   } = useAppStore();
+
+  // Hạn chót tạo báo cáo 18:30 (Thứ Hai - Thứ Sáu)
+  const { isLocked: isCreateLocked, minutesLeft } = useReportDeadline();
+  const showDeadlineWarning = !isCreateLocked && minutesLeft !== null && minutesLeft <= 30;
 
   // Dynamically compute all weeks for the selected year
   const weeks = useMemo(() => getWeeksInYear(selectedYear), [selectedYear]);
@@ -275,29 +280,62 @@ export default function FilterBar({ onCreateNewReport, onShowNotice }: FilterBar
 
         {/* Nút + Tạo báo cáo */}
         <button
+          id="create-report-btn"
           type="button"
           className="filter-action-btn"
-          onClick={onCreateNewReport}
+          onClick={() => {
+            if (isCreateLocked) {
+              showToast(`Đã quá ${REPORT_DEADLINE_LABEL}, không thể tạo báo cáo mới hôm nay!`, 'danger', '⏰');
+              return;
+            }
+            onCreateNewReport();
+          }}
+          disabled={isCreateLocked}
+          title={
+            isCreateLocked
+              ? `Đã quá hạn ${REPORT_DEADLINE_LABEL}, không thể tạo báo cáo mới`
+              : `Hạn chót tạo báo cáo: ${REPORT_DEADLINE_LABEL} (Thứ Hai - Thứ Sáu)`
+          }
           style={{
             height: '36px',
             padding: '0 16px',
             borderRadius: '4px',
-            backgroundColor: '#d97706',
+            backgroundColor: isCreateLocked ? '#9ca3af' : '#d97706',
             color: '#ffffff',
             border: 'none',
             fontSize: '13px',
             fontWeight: 700,
-            cursor: 'pointer',
+            cursor: isCreateLocked ? 'not-allowed' : 'pointer',
+            opacity: isCreateLocked ? 0.85 : 1,
             transition: 'background-color 0.15s',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
           }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#b45309')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#d97706')}
+          onMouseOver={(e) => {
+            if (!isCreateLocked) e.currentTarget.style.backgroundColor = '#b45309';
+          }}
+          onMouseOut={(e) => {
+            if (!isCreateLocked) e.currentTarget.style.backgroundColor = '#d97706';
+          }}
         >
-          <PlusCircle size={16} />
-          <span>Tạo báo cáo</span>
+          {isCreateLocked ? <Lock size={15} /> : <PlusCircle size={16} />}
+          <span>{isCreateLocked ? `Đã khóa (sau ${REPORT_DEADLINE_LABEL})` : 'Tạo báo cáo'}</span>
+          {showDeadlineWarning && (
+            <span
+              style={{
+                marginLeft: '2px',
+                padding: '1px 6px',
+                borderRadius: '999px',
+                backgroundColor: '#ffffff',
+                color: '#b45309',
+                fontSize: '11px',
+                fontWeight: 700,
+              }}
+            >
+              Còn {minutesLeft} phút
+            </span>
+          )}
         </button>
 
         {/* Nút ▲ Lưu ý */}

@@ -238,3 +238,55 @@ export function getDateOfDayInWeek(year: number, weekNumber: number, dayOfWeek: 
   return `${targetDate.getFullYear()}-${pad(targetDate.getMonth() + 1)}-${pad(targetDate.getDate())}`;
 }
 
+/**
+ * Hạn chót tạo báo cáo mới mỗi ngày (giờ Việt Nam).
+ * Chỉ áp dụng từ Thứ Hai đến Thứ Sáu — Thứ Bảy & Chủ Nhật không giới hạn.
+ */
+export const REPORT_DEADLINE = { hour: 18, minute: 30 };
+export const REPORT_DEADLINE_LABEL = `${String(REPORT_DEADLINE.hour).padStart(2, '0')}:${String(REPORT_DEADLINE.minute).padStart(2, '0')}`;
+const VN_TIMEZONE = 'Asia/Ho_Chi_Minh';
+
+/**
+ * Lấy thứ / giờ / phút hiện tại theo múi giờ Việt Nam (không phụ thuộc múi giờ của máy).
+ * isoDay: 1 = Thứ Hai ... 7 = Chủ Nhật
+ */
+export function getVietnamTimeParts(now: Date = new Date()): { isoDay: number; hour: number; minute: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: VN_TIMEZONE,
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now);
+
+  const get = (type: string) => parts.find((p) => p.type === type)?.value || '';
+  const weekdayMap: Record<string, number> = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 };
+
+  return {
+    isoDay: weekdayMap[get('weekday')] || 1,
+    hour: Number(get('hour')) % 24,
+    minute: Number(get('minute')),
+  };
+}
+
+/** Hôm nay (giờ VN) có áp dụng hạn chót không — chỉ Thứ Hai đến Thứ Sáu. */
+export function isDeadlineDay(now: Date = new Date()): boolean {
+  return getVietnamTimeParts(now).isoDay <= 5;
+}
+
+/**
+ * Số phút còn lại tới hạn chót hôm nay.
+ * Trả về null nếu hôm nay không áp dụng hạn chót (cuối tuần). Giá trị <= 0 nghĩa là đã quá hạn.
+ */
+export function getMinutesUntilDeadline(now: Date = new Date()): number | null {
+  const { isoDay, hour, minute } = getVietnamTimeParts(now);
+  if (isoDay > 5) return null;
+  return REPORT_DEADLINE.hour * 60 + REPORT_DEADLINE.minute - (hour * 60 + minute);
+}
+
+/** true nếu đã quá hạn chót tạo báo cáo hôm nay. */
+export function isPastReportDeadline(now: Date = new Date()): boolean {
+  const minutesLeft = getMinutesUntilDeadline(now);
+  return minutesLeft !== null && minutesLeft <= 0;
+}
+
